@@ -6,6 +6,12 @@
         "ddd",
         "micro framework"
     ],
+    "authors": [
+        {
+            "name": "Alexander Stepanenko",
+            "email": "alex.stepanenko@gmail.com"
+        }
+    ],
     "type": "library",
     "license": "BSD-3-Clause",
     "minimum-stability": "stable",
