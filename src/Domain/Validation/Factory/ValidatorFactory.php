@@ -8,6 +8,7 @@ use Whirlwind\Domain\Validation\Validator\EmailValidator;
 use Whirlwind\Domain\Validation\Validator\IntegerValidator;
 use Whirlwind\Domain\Validation\Validator\InValidator;
 use Whirlwind\Domain\Validation\Validator\NumberValidator;
+use Whirlwind\Domain\Validation\Validator\RegularExpressionValidator;
 use Whirlwind\Domain\Validation\Validator\RequiredValidator;
 use Whirlwind\Domain\Validation\Validator\StringValidator;
 use Whirlwind\Domain\Validation\Validator\ValidatorInterface;
@@ -22,6 +23,7 @@ class ValidatorFactory
         'email' => EmailValidator::class,
         'in' => InValidator::class,
         'number' => NumberValidator::class,
+        'regex' => RegularExpressionValidator::class,
         'string' => StringValidator::class
     ];
 
