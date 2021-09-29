@@ -1,5 +1,5 @@
 {
-    "name": "indigerd/whirlwind",
+    "name": "whirlwind-framework/framework",
     "description": "Whirlwind DDD micro framework",
     "keywords": [
         "framework",
@@ -17,8 +17,7 @@
         "laminas/laminas-diactoros": "2.4.x-dev",
         "laminas/laminas-httphandlerrunner": "1.3.x-dev",
         "league/container": "3.3.1",
-        "psr/cache": "^1.0",
-        "vlucas/phpdotenv": "^2.0"
+        "psr/cache": "^1.0"
     },
     "require-dev": {
         "dg/bypass-finals": "^1.2",
@@ -26,21 +25,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Whirlwind\\": "src",
-            "App\\": "boilerplate/App",
-            "Domain\\": "boilerplate/Domain",
-            "Infrastructure\\": "boilerplate/Infrastructure"
+            "Whirlwind\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "Test\\": "tests"
         }
-    },
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://asset-packagist.org"
-        }
-    ]
+    }
 }
