@@ -49,7 +49,7 @@ class StringValidator extends AbstractValidator
 
     public function validate($value, array $context = []): bool
     {
-        if ($this->skipOnEmpty and ($value === null || \trim($value) === '')) {
+        if ($this->skipOnEmpty and $this->isEmptyValue($value)) {
             return true;
         }
         if (!\is_string($value)) {
@@ -69,5 +69,18 @@ class StringValidator extends AbstractValidator
             return false;
         }
         return true;
+    }
+
+    protected function isEmptyValue($value): bool
+    {
+        if ($value === null) {
+            return true;
+        }
+
+        if (\is_string($value) && \trim($value) === '') {
+            return true;
+        }
+
+        return false;
     }
 }
