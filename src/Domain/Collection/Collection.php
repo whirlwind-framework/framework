@@ -91,4 +91,34 @@ class Collection implements CollectionInterface
     {
         return \count($this->items);
     }
+
+    /**
+     * @return mixed|null
+     */
+    public function first()
+    {
+        $first = \reset($this->items);
+
+        return false == $first ? null : $first;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function last()
+    {
+        $last = \end($this->items);
+
+        return false === $last ? null : $last;
+    }
+
+    /**
+     * @param callable $callback
+     * @param int $mode
+     * @return $this
+     */
+    public function filter(callable $callback, int $mode = 0): self
+    {
+        return new static($this->entityClass, \array_filter($this->items, $callback, $mode));
+    }
 }

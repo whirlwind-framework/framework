@@ -10,7 +10,7 @@ class InValidator extends AbstractValidator
 
     protected $message = 'Value do not belongs to valid set';
 
-    public function setValidSet($value) : self
+    public function setValidSet($value): self
     {
         if (!\is_array($value)
             and !($value instanceof \Closure)
@@ -20,10 +20,11 @@ class InValidator extends AbstractValidator
                 'Invalid validSet property value. Value must be either array or \Closure or \Traversable'
             );
         }
+        $this->validSet = $value;
         return $this;
     }
 
-    public function validate($value, array $context = []) : bool
+    public function validate($value, array $context = []): bool
     {
         if ($this->skipOnEmpty and ($value === null || $value === [] || $value === '')) {
             return true;
