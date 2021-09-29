@@ -4,6 +4,11 @@ namespace Whirlwind\Domain\Dto;
 
 abstract class Dto implements DtoInterface
 {
+    /**
+     * Dto constructor.
+     * @param array $data
+     * @throws \ReflectionException
+     */
     public function __construct(array $data)
     {
         $properties = (new \ReflectionClass($this))->getProperties(\ReflectionProperty::IS_PROTECTED);
@@ -15,11 +20,36 @@ abstract class Dto implements DtoInterface
         }
     }
 
+    /**
+     * @return array
+     */
     public function toArray(): array
     {
-        return \get_object_vars($this);
+        $data = \get_object_vars($this);
+        foreach ($data as $key => $val) {
+            $accessor = $this->resolveAccessor($key);
+            if (\method_exists($this, $accessor)) {
+                $data[$key] = $this->$accessor();
+            }
+            if ($data[$key] instanceof ArrayableInterface) {
+                $data[$key] = $data[$key]->toArray();
+            }
+        }
+        return $data;
     }
 
+    protected function resolveAccessor($key): string
+    {
+        if (\strpos($key, 'is') !== false && \method_exists($this, $key)) {
+            return $key;
+        }
+
+        return 'get' . \ucfirst($key);
+    }
+
+    /**
+     * @return array
+     */
     public function jsonSerialize()
     {
         return $this->toArray();
