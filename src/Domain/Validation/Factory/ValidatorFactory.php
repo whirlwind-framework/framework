@@ -4,6 +4,7 @@ namespace Whirlwind\Domain\Validation\Factory;
 
 use Whirlwind\Domain\Validation\Validator\ArrayEachValidator;
 use Whirlwind\Domain\Validation\Validator\ArrayValidator;
+use Whirlwind\Domain\Validation\Validator\BooleanValidator;
 use Whirlwind\Domain\Validation\Validator\EmailValidator;
 use Whirlwind\Domain\Validation\Validator\IntegerValidator;
 use Whirlwind\Domain\Validation\Validator\InValidator;
@@ -23,6 +24,7 @@ class ValidatorFactory
         'email' => EmailValidator::class,
         'in' => InValidator::class,
         'number' => NumberValidator::class,
+        'boolean' => BooleanValidator::class,
         'regex' => RegularExpressionValidator::class,
         'string' => StringValidator::class
     ];

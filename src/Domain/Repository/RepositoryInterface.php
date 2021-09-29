@@ -35,4 +35,6 @@ interface RepositoryInterface
     public function updateAll(array $data, array $conditions): int;
 
     public function deleteAll(array $conditions): int;
+
+    public function populate(object $entity, array $data): void;
 }
