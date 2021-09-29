@@ -14,7 +14,6 @@
     ],
     "type": "library",
     "license": "BSD-3-Clause",
-    "minimum-stability": "stable",
     "require": {
         "php": "~7.4",
         "ext-mongodb": "*",
