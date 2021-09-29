@@ -2,6 +2,8 @@
 
 namespace Whirlwind\Domain\Validation;
 
+use Whirlwind\Domain\Dto\FluentDto;
+use Whirlwind\Domain\Validation\Validator\ValidatorCollection;
 use Whirlwind\Domain\Validation\Validator\ValidatorInterface;
 use Whirlwind\Domain\Validation\Exception\ValidateException;
 use Whirlwind\Domain\Validation\Factory\ValidatorFactory;
@@ -52,10 +54,47 @@ class Scenario
         return $this;
     }
 
-    public function validateDto(DtoInterface $dto) : bool
+    /**
+     * @param FluentDto $dto
+     * @return bool
+     * @throws ValidateException
+     */
+    public function validateFluentDto(FluentDto $dto): bool
+    {
+        $data = $dto->toArray();
+        $oldAttributes = $this->attributes;
+        foreach ($this->attributes as $attribute => $validatorCollection) {
+            if (!isset($data[$attribute])) {
+                unset($this->attributes[$attribute]);
+            }
+        }
+        $result = $this->validateDto($dto);
+        $this->attributes = $oldAttributes;
+        return $result;
+    }
+
+    /**
+     * @param DtoInterface $dto
+     * @return bool
+     * @throws ValidateException
+     */
+    public function validateDto(DtoInterface $dto): bool
+    {
+        return $this->validateArray($dto->toArray());
+    }
+
+    /**
+     * @param array $context
+     * @return bool
+     * @throws ValidateException
+     */
+    public function validateArray(array $context): bool
     {
         $errors = [];
-        $context = $dto->toArray();
+        /**
+         * @var string $attribute
+         * @var ValidatorCollection $validatorCollection
+         */
         foreach ($this->attributes as $attribute => $validatorCollection) {
             $value = isset($context[$attribute]) ? $context[$attribute] : null;
             if (!$validatorCollection->validate($value, $context)) {
