@@ -12,7 +12,7 @@ class NumberValidator extends AbstractValidator
 
     protected $max = null;
 
-    public function setMin($min) : self
+    public function setMin($min): self
     {
         if (\intval($min) <= 0) {
             throw new \InvalidArgumentException('Invalid min param value');
@@ -21,7 +21,7 @@ class NumberValidator extends AbstractValidator
         return $this;
     }
 
-    public function setMax($max) : self
+    public function setMax($max): self
     {
         if (\intval($max) <= 0) {
             throw new \InvalidArgumentException('Invalid max param value');
@@ -30,9 +30,9 @@ class NumberValidator extends AbstractValidator
         return $this;
     }
 
-    protected function normalizeNumber($value) : string
+    protected function normalizeNumber($value): string
     {
-        $value = (string)$value;
+        $value = \is_scalar($value) ? (string)$value : '';
         $localeInfo = \localeconv();
         $decimalSeparator = isset($localeInfo['decimal_point']) ? $localeInfo['decimal_point'] : null;
 
@@ -44,7 +44,7 @@ class NumberValidator extends AbstractValidator
 
     public function validate($value, array $context = []): bool
     {
-        if ($this->skipOnEmpty and ($value === null || \trim((string)$value) === '')) {
+        if ($this->skipOnEmpty and $this->isEmptyValue($value)) {
             return true;
         }
         if (!\preg_match($this->pattern, $this->normalizeNumber($value))) {
@@ -59,5 +59,18 @@ class NumberValidator extends AbstractValidator
             return false;
         }
         return true;
+    }
+
+    protected function isEmptyValue($value): bool
+    {
+        if ($value === null) {
+            return true;
+        }
+
+        if (\is_string($value) && \trim($value) === '') {
+            return true;
+        }
+
+        return false;
     }
 }
