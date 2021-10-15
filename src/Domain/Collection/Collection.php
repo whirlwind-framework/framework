@@ -119,6 +119,9 @@ class Collection implements CollectionInterface
      */
     public function filter(callable $callback, int $mode = 0): self
     {
-        return new static($this->entityClass, \array_filter($this->items, $callback, $mode));
+        $copy = clone $this;
+        $copy->items = \array_filter($this->items, $callback, $mode);
+
+        return $copy;
     }
 }
