@@ -121,6 +121,7 @@ class Collection implements CollectionInterface
     {
         $copy = clone $this;
         $copy->items = \array_filter($this->items, $callback, $mode);
+
         return $copy;
     }
 }
