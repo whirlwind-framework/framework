@@ -86,4 +86,9 @@ class MemcacheProvider implements ProviderInterface
     {
         $this->memcache->add($key, $value, 0, $ttl);
     }
+
+    public function increment($key)
+    {
+        return $this->memcache->increment($key);
+    }
 }
