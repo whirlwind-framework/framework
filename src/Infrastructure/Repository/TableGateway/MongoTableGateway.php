@@ -3,6 +3,7 @@
 namespace Whirlwind\Infrastructure\Repository\TableGateway;
 
 use MongoDB\BSON\ObjectId;
+use Whirlwind\Infrastructure\Persistence\Mongo\ConditionBuilder\ConditionBuilder;
 use Whirlwind\Infrastructure\Persistence\Mongo\MongoConnection;
 use Whirlwind\Infrastructure\Repository\Exception\DeleteException;
 use Whirlwind\Infrastructure\Repository\Exception\UpdateException;
@@ -15,17 +16,25 @@ class MongoTableGateway implements TableGatewayInterface
 
     protected $queryFactory;
 
+    protected $conditionBuilder;
+
     protected $collectionName;
 
-    public function __construct(MongoConnection $connection, MongoQueryFactory $queryFactory, string $collectionName)
-    {
+    public function __construct(
+        MongoConnection $connection,
+        MongoQueryFactory $queryFactory,
+        ConditionBuilder $conditionBuilder,
+        string $collectionName
+    ) {
         $this->connection = $connection;
         $this->queryFactory = $queryFactory;
+        $this->conditionBuilder = $conditionBuilder;
         $this->collectionName = $collectionName;
     }
 
     public function queryOne(array $conditions, array $relations = []): ?array
     {
+        $conditions = $this->conditionBuilder->build($conditions);
         /** @var \Whirlwind\Infrastructure\Persistence\Mongo\Query\MongoQuery $query */
         $query = $this->queryFactory->create($this->connection);
         $query
@@ -55,6 +64,7 @@ class MongoTableGateway implements TableGatewayInterface
 
     public function updateAll(array $data, array $conditions): int
     {
+        $conditions = $this->conditionBuilder->build($conditions);
         return $this->connection->getCollection($this->collectionName)->update($conditions, $data);
     }
 
@@ -69,11 +79,13 @@ class MongoTableGateway implements TableGatewayInterface
 
     public function deleteAll(array $conditions): int
     {
+        $conditions = $this->conditionBuilder->build($conditions);
         return $this->connection->getCollection($this->collectionName)->remove($conditions);
     }
 
     public function queryAll(array $conditions, array $order = [], int $limit = 0, int $offset = 0, array $relations = []): array
     {
+        $conditions = $this->conditionBuilder->build($conditions);
         /** @var \Whirlwind\Infrastructure\Persistence\Mongo\Query\MongoQuery $query */
         $query = $this->queryFactory->create($this->connection);
         $query
@@ -93,6 +105,7 @@ class MongoTableGateway implements TableGatewayInterface
 
     public function aggregate($column, $operator, array $conditions): string
     {
+        $conditions = $this->conditionBuilder->build($conditions);
         /** @var \Whirlwind\Infrastructure\Persistence\Mongo\Query\MongoQuery $query */
         $query = $this->queryFactory->create($this->connection);
         return (string)$query->from($this->collectionName)->where($conditions)->aggregate($column, $operator);
@@ -100,6 +113,7 @@ class MongoTableGateway implements TableGatewayInterface
 
     public function aggregateCount(string $field = '', array $conditions = []): string
     {
+        $conditions = $this->conditionBuilder->build($conditions);
         /** @var MongoQuery $query */
         $query = $this->queryFactory->create($this->connection);
         return (string)$query->from($this->collectionName)->where($conditions)->count('*');
@@ -107,6 +121,7 @@ class MongoTableGateway implements TableGatewayInterface
 
     public function aggregateSum(string $field, array $conditions = []): string
     {
+        $conditions = $this->conditionBuilder->build($conditions);
         /** @var MongoQuery $query */
         $query = $this->queryFactory->create($this->connection);
         return (string)$query->from($this->collectionName)->where($conditions)->sum($field);
@@ -114,6 +129,7 @@ class MongoTableGateway implements TableGatewayInterface
 
     public function aggregateAverage(string $field, array $conditions = []): string
     {
+        $conditions = $this->conditionBuilder->build($conditions);
         /** @var \Whirlwind\Infrastructure\Persistence\Mongo\Query\MongoQuery $query */
         $query = $this->queryFactory->create($this->connection);
         return (string)$query->from($this->collectionName)->where($conditions)->average($field);
@@ -121,6 +137,7 @@ class MongoTableGateway implements TableGatewayInterface
 
     public function aggregateMin(string $field, array $conditions = []): string
     {
+        $conditions = $this->conditionBuilder->build($conditions);
         /** @var MongoQuery $query */
         $query = $this->queryFactory->create($this->connection);
         return (string)$query->from($this->collectionName)->where($conditions)->min($field);
@@ -128,9 +145,9 @@ class MongoTableGateway implements TableGatewayInterface
 
     public function aggregateMax(string $field, array $conditions = []): string
     {
+        $conditions = $this->conditionBuilder->build($conditions);
         /** @var \Whirlwind\Infrastructure\Persistence\Mongo\Query\MongoQuery $query */
         $query = $this->queryFactory->create($this->connection);
         return (string)$query->from($this->collectionName)->where($conditions)->max($field);
     }
 }
-
