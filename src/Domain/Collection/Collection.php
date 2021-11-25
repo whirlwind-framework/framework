@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Domain\Collection;
 
@@ -84,7 +86,7 @@ class Collection implements CollectionInterface
 
     public function valid(): bool
     {
-        return (boolean)$this->current();
+        return (bool)$this->current();
     }
 
     public function count(): int

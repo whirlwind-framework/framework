@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Persistence\Mongo\Command;
 
@@ -49,37 +51,37 @@ class MongoCommand
 
     public function getWriteConcern(): ?WriteConcern
     {
-        if ($this->writeConcern !== null) {
-            if (\is_scalar($this->writeConcern)) {
-                $this->writeConcern = new WriteConcern($this->writeConcern);
-            }
+        if (\is_scalar($this->writeConcern)) {
+            $this->writeConcern = new WriteConcern($this->writeConcern);
         }
         return $this->writeConcern;
     }
 
     public function getReadConcern(): ?ReadConcern
     {
-        if ($this->readConcern !== null) {
-            if (\is_scalar($this->readConcern)) {
-                $this->readConcern = new ReadConcern($this->readConcern);
-            }
+        if (\is_scalar($this->readConcern)) {
+            $this->readConcern = new ReadConcern($this->readConcern);
         }
         return $this->readConcern;
     }
 
     public function execute(): Cursor
     {
-        $databaseName = $this->databaseName === null ? $this->connection->getDefaultDatabaseName() : $this->databaseName;
+        $databaseName = $this->databaseName ?? $this->connection->getDefaultDatabaseName();
         $this->connection->open();
         $mongoCommand = new Command($this->document);
-        $cursor = $this->connection->getManager()->executeCommand($databaseName, $mongoCommand, $this->getReadPreference());
+        $cursor = $this->connection->getManager()->executeCommand(
+            $databaseName,
+            $mongoCommand,
+            $this->getReadPreference()
+        );
         $cursor->setTypeMap($this->connection->getTypeMap());
         return $cursor;
     }
 
     public function executeBatch($collectionName, $options = []): array
     {
-        $databaseName = $this->databaseName === null ? $this->connection->getDefaultDatabaseName() : $this->databaseName;
+        $databaseName = $this->databaseName ?? $this->connection->getDefaultDatabaseName();
         $batch = new BulkWrite($options);
         $insertedIds = [];
         foreach ($this->document as $key => $operation) {
@@ -91,7 +93,7 @@ class MongoCommand
                     $batch->update($operation['condition'], $operation['document'], $operation['options']);
                     break;
                 case 'delete':
-                    $batch->delete($operation['condition'], isset($operation['options']) ? $operation['options'] : []);
+                    $batch->delete($operation['condition'], $operation['options'] ?? []);
                     break;
                 default:
                     throw new \InvalidArgumentException("Unsupported batch operation type '{$operation['type']}'");
@@ -99,7 +101,11 @@ class MongoCommand
         }
 
         $this->connection->open();
-        $writeResult = $this->connection->getManager()->executeBulkWrite($databaseName . '.' . $collectionName, $batch, $this->getWriteConcern());
+        $writeResult = $this->connection->getManager()->executeBulkWrite(
+            $databaseName . '.' . $collectionName,
+            $batch,
+            $this->getWriteConcern()
+        );
 
         return [
             'insertedIds' => $insertedIds,
@@ -109,7 +115,7 @@ class MongoCommand
 
     public function query($collectionName, $options = []): Cursor
     {
-        $databaseName = $this->databaseName === null ? $this->connection->getDefaultDatabaseName() : $this->databaseName;
+        $databaseName = $this->databaseName ?? $this->connection->getDefaultDatabaseName();
 
         $readConcern = $this->getReadConcern();
         if ($readConcern !== null) {
@@ -117,7 +123,11 @@ class MongoCommand
         }
         $query = new Query($this->document, $options);
         $this->connection->open();
-        $cursor = $this->connection->getManager()->executeQuery($databaseName . '.' . $collectionName, $query, $this->getReadPreference());
+        $cursor = $this->connection->getManager()->executeQuery(
+            $databaseName . '.' . $collectionName,
+            $query,
+            $this->getReadPreference()
+        );
         $cursor->setTypeMap($this->connection->getTypeMap());
         return $cursor;
     }
@@ -258,7 +268,12 @@ class MongoCommand
 
     public function findAndModify($collectionName, $condition = [], $update = [], $options = [])
     {
-        $this->document = $this->connection->getQueryBuilder()->findAndModify($collectionName, $condition, $update, $options);
+        $this->document = $this->connection->getQueryBuilder()->findAndModify(
+            $collectionName,
+            $condition,
+            $update,
+            $options
+        );
         $cursor = $this->execute();
         $result = current($cursor->toArray());
         if (!isset($result['value'])) {
@@ -269,7 +284,12 @@ class MongoCommand
 
     public function distinct($collectionName, $fieldName, $condition = [], $options = [])
     {
-        $this->document = $this->connection->getQueryBuilder()->distinct($collectionName, $fieldName, $condition, $options);
+        $this->document = $this->connection->getQueryBuilder()->distinct(
+            $collectionName,
+            $fieldName,
+            $condition,
+            $options
+        );
         $cursor = $this->execute();
         $result = \current($cursor->toArray());
         if (!isset($result['values']) || !\is_array($result['values'])) {
@@ -280,7 +300,13 @@ class MongoCommand
 
     public function group($collectionName, $keys, $initial, $reduce, $options = [])
     {
-        $this->document = $this->connection->getQueryBuilder()->group($collectionName, $keys, $initial, $reduce, $options);
+        $this->document = $this->connection->getQueryBuilder()->group(
+            $collectionName,
+            $keys,
+            $initial,
+            $reduce,
+            $options
+        );
         $cursor = $this->execute();
         $result = \current($cursor->toArray());
         return $result['retval'];
@@ -288,7 +314,14 @@ class MongoCommand
 
     public function mapReduce($collectionName, $map, $reduce, $out, $condition = [], $options = [])
     {
-        $this->document = $this->connection->getQueryBuilder()->mapReduce($collectionName, $map, $reduce, $out, $condition, $options);
+        $this->document = $this->connection->getQueryBuilder()->mapReduce(
+            $collectionName,
+            $map,
+            $reduce,
+            $out,
+            $condition,
+            $options
+        );
         $cursor = $this->execute();
         $result = \current($cursor->toArray());
         return \array_key_exists('results', $result) ? $result['results'] : $result['result'];

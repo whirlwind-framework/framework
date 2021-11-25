@@ -18,7 +18,7 @@ class RegularExpressionValidator extends AbstractValidator
      */
     public function validate($value, array $context = []): bool
     {
-        if ($this->skipOnEmpty and $this->isEmpty($value)) {
+        if ($this->skipOnEmpty && $this->isEmpty($value)) {
             return true;
         }
 

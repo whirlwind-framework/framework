@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Domain\Validation\Validator;
 
@@ -19,13 +21,13 @@ class ArrayValidator extends AbstractValidator
 
     public function validate($value, array $context = []): bool
     {
-        if ($this->skipOnEmpty and ($value === [] or $value === null)) {
+        if ($this->skipOnEmpty && ($value === [] or $value === null)) {
             return true;
         }
         if (!\is_array($value)) {
             return false;
         }
-        if ($this->size !== null and $this->size !== \sizeof($value)) {
+        if ($this->size !== null && $this->size !== \sizeof($value)) {
             $this->message = 'Expected array size: ' . $this->size . '. Actual: ' . \sizeof($value);
         }
         return true;

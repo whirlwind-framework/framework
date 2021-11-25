@@ -21,7 +21,7 @@ class UuidValidator extends AbstractValidator
      */
     public function validate($value, array $context = []): bool
     {
-        if ($this->skipOnEmpty and ($value === null || \trim($value) === '')) {
+        if ($this->skipOnEmpty && ($value === null || \trim($value) === '')) {
             return true;
         }
 

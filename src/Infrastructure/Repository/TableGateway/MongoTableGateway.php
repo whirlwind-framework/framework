@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Repository\TableGateway;
 
@@ -83,8 +85,13 @@ class MongoTableGateway implements TableGatewayInterface
         return $this->connection->getCollection($this->collectionName)->remove($conditions);
     }
 
-    public function queryAll(array $conditions, array $order = [], int $limit = 0, int $offset = 0, array $relations = []): array
-    {
+    public function queryAll(
+        array $conditions,
+        array $order = [],
+        int $limit = 0,
+        int $offset = 0,
+        array $relations = []
+    ): array {
         $conditions = $this->conditionBuilder->build($conditions);
         /** @var \Whirlwind\Infrastructure\Persistence\Mongo\Query\MongoQuery $query */
         $query = $this->queryFactory->create($this->connection);

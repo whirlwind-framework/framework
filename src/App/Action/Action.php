@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\App\Action;
 
@@ -25,7 +27,7 @@ abstract class Action
         $this->serializer = $serializer;
     }
 
-    public function __invoke(ServerRequestInterface $request, array $args = []) : ResponseInterface
+    public function __invoke(ServerRequestInterface $request, array $args = []): ResponseInterface
     {
         $this->request = $request;
         $this->response = $this->responseFactory

@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Persistence;
 
 interface QueryInterface
 {
-    public function all(): array ;
+    public function all(): array;
 
     public function one();
 

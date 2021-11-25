@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Hydrator\Accessor;
 
@@ -14,7 +16,8 @@ class PropertyAccessor implements AccessorInterface
                 $property->setAccessible(true);
             }
             $property->setValue($object, $value);
-        } catch (\ReflectionException $e) {}
+        } catch (\ReflectionException $e) {
+        }
     }
 
     public function get(object $object, ReflectionClass $reflection, $name)
@@ -25,7 +28,8 @@ class PropertyAccessor implements AccessorInterface
                 $property->setAccessible(true);
             }
             return $property->getValue($object);
-        } catch (\ReflectionException $e) {}
+        } catch (\ReflectionException $e) {
+        }
     }
 
     public function getPropertyNames(object $object, ReflectionClass $reflection)

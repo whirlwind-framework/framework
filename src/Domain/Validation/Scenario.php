@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Domain\Validation;
 
@@ -33,7 +35,7 @@ class Scenario
         }
     }
 
-    public function addValidationRule($attribute, $validator, array $params = []) : self
+    public function addValidationRule($attribute, $validator, array $params = []): self
     {
         $attributes = \is_array($attribute) ? $attribute : [$attribute];
         foreach ($attributes as $attributeName) {
@@ -45,7 +47,7 @@ class Scenario
         return $this;
     }
 
-    public function addValidator($attribute, ValidatorInterface $validator) : self
+    public function addValidator($attribute, ValidatorInterface $validator): self
     {
         if (!isset($this->attributes[$attribute])) {
             $this->attributes[$attribute] = $this->validatorCollectionFactory->create();

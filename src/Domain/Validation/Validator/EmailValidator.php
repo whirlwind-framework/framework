@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Domain\Validation\Validator;
 
@@ -11,7 +13,7 @@ class EmailValidator extends AbstractValidator
 
     public function validate($value, array $context = []): bool
     {
-        if ($this->skipOnEmpty and ($value === null || \trim($value) === '')) {
+        if ($this->skipOnEmpty && ($value === null || \trim($value) === '')) {
             return true;
         }
         if (!\is_string($value)) {

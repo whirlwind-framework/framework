@@ -85,7 +85,7 @@ class DateTimeValidator extends AbstractValidator
      */
     public function validate($value, array $context = []): bool
     {
-        if ($this->skipOnEmpty and empty($value)) {
+        if ($this->skipOnEmpty && empty($value)) {
             return true;
         }
 
@@ -93,7 +93,8 @@ class DateTimeValidator extends AbstractValidator
             return false;
         }
 
-        if (null !== $this->before
+        if (
+            null !== $this->before
             && $this->isValidDate($value)
             && ($this->getTimestamp($this->before) <= $this->getTimestamp($value))
         ) {
@@ -102,7 +103,8 @@ class DateTimeValidator extends AbstractValidator
             return false;
         }
 
-        if (null !== $this->after
+        if (
+            null !== $this->after
             && $this->isValidDate($value)
             && ($this->getTimestamp($this->after) >= $this->getTimestamp($value))
         ) {

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Domain\Validation\Exception;
 
@@ -18,7 +20,7 @@ class ValidateException extends \Exception
         parent::__construct($message, $code, $previous);
     }
 
-    public function getErrorCollection() : array
+    public function getErrorCollection(): array
     {
         return $this->errorCollection;
     }

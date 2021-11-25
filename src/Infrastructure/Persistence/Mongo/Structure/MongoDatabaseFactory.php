@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Persistence\Mongo\Structure;
 
@@ -15,7 +17,7 @@ class MongoDatabaseFactory
         $this->collectionFactory = $collectionFactory;
     }
 
-    public function create(\Whirlwind\Infrastructure\Persistence\Mongo\MongoConnection $connection, string $name): MongoDatabase
+    public function create(MongoConnection $connection, string $name): MongoDatabase
     {
         return new MongoDatabase($this->collectionFactory, $connection, $name);
     }

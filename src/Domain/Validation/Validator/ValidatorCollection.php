@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Domain\Validation\Validator;
 
@@ -13,13 +15,13 @@ class ValidatorCollection
         $this->validators = $validators;
     }
 
-    public function addValidator(ValidatorInterface $validator) : self
+    public function addValidator(ValidatorInterface $validator): self
     {
         $this->validators[] = $validator;
         return $this;
     }
 
-    public function validate($value, array $context = []) : bool
+    public function validate($value, array $context = []): bool
     {
         $valid = true;
         $this->messages = [];
@@ -32,7 +34,7 @@ class ValidatorCollection
         return $valid;
     }
 
-    public function getMessages() : array
+    public function getMessages(): array
     {
         return $this->messages;
     }
