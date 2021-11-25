@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\App\Application\Adapter;
 
@@ -16,7 +18,9 @@ use Whirlwind\App\Emitter\Adapter\LaminasSapiEmitterAdapter;
 use Whirlwind\App\Router\Adapter\LeagueRouterAdapter;
 use Whirlwind\App\Router\RouterInterface;
 
-class LeagueApplicationServiceProviderAdapter extends AbstractServiceProvider implements BootableServiceProviderInterface, ApplicationServiceProviderInterface
+class LeagueApplicationServiceProviderAdapter extends AbstractServiceProvider implements
+    BootableServiceProviderInterface,
+    ApplicationServiceProviderInterface
 {
     protected $provides = [
         ResponseFactoryInterface::class,
@@ -28,7 +32,7 @@ class LeagueApplicationServiceProviderAdapter extends AbstractServiceProvider im
     public function boot(): void
     {
         $this->getContainer()->delegate(
-            (new ReflectionContainer)->cacheResolutions(false)
+            (new ReflectionContainer(false))
         );
     }
 
@@ -39,21 +43,28 @@ class LeagueApplicationServiceProviderAdapter extends AbstractServiceProvider im
             ServerRequestFactoryInterface::class,
             LaminasServerRequestFactoryAdapter::class
         )->setShared();
+
         $container->add(
             ResponseFactoryInterface::class,
             ResponseFactory::class
         )->setShared();
+
         $container->add(
             RouterInterface::class,
             function () use ($container) {
-                $strategy = (new ApplicationStrategy)->setContainer($container);
-                $router = (new LeagueRouterAdapter())->setStrategy($strategy);
-                return $router;
+                $strategy = (new ApplicationStrategy())->setContainer($container);
+                return (new LeagueRouterAdapter())->setStrategy($strategy);
             }
         )->setShared();
+
         $container->add(
             EmitterInterface::class,
             LaminasSapiEmitterAdapter::class
         )->setShared();
+    }
+
+    public function provides(string $id): bool
+    {
+        return in_array($id, $this->provides, true);
     }
 }
