@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Domain\Validation\Validator;
 
@@ -18,22 +20,22 @@ abstract class AbstractValidator implements ValidatorInterface
         }
     }
 
-    public function setSkipOnEmpty($value) : self
+    public function setSkipOnEmpty($value): self
     {
         $this->skipOnEmpty = (bool)$value;
         return $this;
     }
 
-    public function setMessage($message) : self
+    public function setMessage($message): self
     {
         $this->message = (string)$message;
         return $this;
     }
 
-    public function getMessage() : string
+    public function getMessage(): string
     {
         return $this->message;
     }
 
-    public abstract function validate($value, array $context = []) : bool;
+    abstract public function validate($value, array $context = []): bool;
 }

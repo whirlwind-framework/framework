@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Hydrator;
 
@@ -23,13 +25,13 @@ class Hydrator
         $this->accessor = $accessor;
     }
 
-    public function addStrategy($name, StrategyInterface $strategy) : self
+    public function addStrategy($name, StrategyInterface $strategy): self
     {
         $this->strategies[$name] = $strategy;
         return $this;
     }
 
-    public function hydrate($target, array $data) : object
+    public function hydrate($target, array $data): object
     {
         $reflection = $this->getReflectionClass($target);
         $object = \is_object($target) ? $target : $reflection->newInstanceWithoutConstructor();
@@ -48,7 +50,7 @@ class Hydrator
         return $object;
     }
 
-    public function extract(object $object, array $fields = []) : array
+    public function extract(object $object, array $fields = []): array
     {
         $reflection = $this->getReflectionClass(\get_class($object));
         $result = [];

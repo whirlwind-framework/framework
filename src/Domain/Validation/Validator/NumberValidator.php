@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Domain\Validation\Validator;
 
@@ -44,17 +46,17 @@ class NumberValidator extends AbstractValidator
 
     public function validate($value, array $context = []): bool
     {
-        if ($this->skipOnEmpty and $this->isEmptyValue($value)) {
+        if ($this->skipOnEmpty && $this->isEmptyValue($value)) {
             return true;
         }
         if (!\preg_match($this->pattern, $this->normalizeNumber($value))) {
             return false;
         }
-        if ($this->min !== null and $this->min > $value) {
+        if ($this->min !== null && $this->min > $value) {
             $this->message = 'Value is too small';
             return false;
         }
-        if ($this->max !== null and $this->max < $value) {
+        if ($this->max !== null && $this->max < $value) {
             $this->message = 'Value is too big';
             return false;
         }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\App\Http\Adapter;
 
@@ -14,8 +16,7 @@ class LaminasServerRequestFactoryAdapter extends ServerRequestFactory implements
         array $body = null,
         array $cookies = null,
         array $files = null
-    ) : ServerRequest
-    {
+    ): ServerRequest {
         return parent::fromGlobals($server, $query, $body, $cookies, $files);
     }
 }

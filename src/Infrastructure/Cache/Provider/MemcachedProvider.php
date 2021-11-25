@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Cache\Provider;
 
-use Memcache;
-use Whirlwind\Infrastructure\Cache\ProviderInterface;
-
-class MemcacheProvider extends AbstractCacheProvider
+class MemcachedProvider extends AbstractCacheProvider
 {
     public function __construct(array $config = [])
     {
@@ -15,17 +12,16 @@ class MemcacheProvider extends AbstractCacheProvider
             $config['servers'] = [[
                 'host' => '127.0.0.1',
                 'port' => 11211,
+                'weight' => 0
             ]];
         }
 
-        $this->cache = new Memcache();
-
+        $this->cache = new \Memcached(($server['persistentId'] ?? 1));
         foreach ($config['servers'] as $server) {
             $this->cache->addServer(
                 $server['host'],
                 $server['port'],
-                true,
-                ($server['weight'] ?? 1)
+                $server['weight']
             );
         }
     }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\App\Http;
 
@@ -12,5 +14,5 @@ interface ServerRequestFactoryInterface extends \Psr\Http\Message\ServerRequestF
         array $body = null,
         array $cookies = null,
         array $files = null
-    ) : ServerRequestInterface;
+    ): ServerRequestInterface;
 }

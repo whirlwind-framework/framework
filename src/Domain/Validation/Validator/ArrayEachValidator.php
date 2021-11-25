@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Domain\Validation\Validator;
 
@@ -14,7 +16,7 @@ class ArrayEachValidator extends ArrayValidator
         }
     }
 
-    public function setValidator(ValidatorInterface $validator) : self
+    public function setValidator(ValidatorInterface $validator): self
     {
         $this->validator = $validator;
         return $this;
@@ -22,7 +24,7 @@ class ArrayEachValidator extends ArrayValidator
 
     public function validate($value, array $context = []): bool
     {
-        if ($this->skipOnEmpty and empty($value)) {
+        if ($this->skipOnEmpty && empty($value)) {
             return true;
         }
         $valid = parent::validate($value, $context);
@@ -30,7 +32,7 @@ class ArrayEachValidator extends ArrayValidator
             return false;
         }
         foreach ($value as $v) {
-            if ($this->skipOnEmpty and empty($v)) {
+            if ($this->skipOnEmpty && empty($v)) {
                 continue;
             }
             $valid = $this->validator->validate($v, $context);

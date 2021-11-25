@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Repository;
 
@@ -55,7 +57,7 @@ class Repository implements RepositoryInterface
         foreach ($relations as $property => $relation) {
             $relationData = [];
             foreach ($data as $field => $value) {
-                if (\strpos($field, $relation->getRelatedCollection() . '_relation_') === 0) {
+                if (str_starts_with($field, $relation->getRelatedCollection() . '_relation_')) {
                     $fieldName = \str_replace($relation->getRelatedCollection() . '_relation_', '', $field);
                     $relationData[$fieldName] = $value;
                 }
@@ -90,12 +92,16 @@ class Repository implements RepositoryInterface
             $data = $this->normalizeResultSet($data, $relations);
             $this->applyRelationStrategies($relations);
         }
-        $result = $this->hydrator->hydrate($this->modelClass, $data);
-        return $result;
+        return $this->hydrator->hydrate($this->modelClass, $data);
     }
 
-    public function findAll(array $conditions = [], array $order = [], int $limit = 0, int $offset = 0, array $with = []): array
-    {
+    public function findAll(
+        array $conditions = [],
+        array $order = [],
+        int $limit = 0,
+        int $offset = 0,
+        array $with = []
+    ): array {
         $result = [];
         $relations = [];
         foreach ($with as $relationName) {
@@ -147,7 +153,9 @@ class Repository implements RepositoryInterface
     protected function validateModelClass(object $model)
     {
         if (!($model instanceof $this->modelClass)) {
-            throw new InvalidModelClassException('Invalid model class: ' . get_class($model) . '. Expected ' . $this->modelClass);
+            throw new InvalidModelClassException(
+                'Invalid model class: ' . get_class($model) . '. Expected ' . $this->modelClass
+            );
         }
     }
 

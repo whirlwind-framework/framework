@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Hydrator\Accessor;
 
@@ -13,7 +15,7 @@ class PropertyArrayAccessor implements AccessorInterface
         $this->propertyArrayName = $propertyArrayName;
     }
 
-    protected function getPropertyArray(ReflectionClass $reflection) : \ReflectionProperty
+    protected function getPropertyArray(ReflectionClass $reflection): \ReflectionProperty
     {
         $property = $reflection->getProperty($this->propertyArrayName);
         if ($property->isPrivate() || $property->isProtected()) {

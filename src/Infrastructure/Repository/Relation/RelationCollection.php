@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Repository\Relation;
 
@@ -19,7 +21,7 @@ class RelationCollection
     public function getRelationByProperty(string $property): ?Relation
     {
         foreach ($this->relations as $relation) {
-            if ($relation->getProperty() == $property) {
+            if ($relation->getProperty() === $property) {
                 return $relation;
             }
         }

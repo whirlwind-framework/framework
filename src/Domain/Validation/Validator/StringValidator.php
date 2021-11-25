@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Domain\Validation\Validator;
 
@@ -14,7 +16,7 @@ class StringValidator extends AbstractValidator
 
     protected $message = 'Value must be a string';
 
-    public function setMin($min) : self
+    public function setMin($min): self
     {
         if (\intval($min) <= 0) {
             throw new \InvalidArgumentException('Invalid min param value');
@@ -23,7 +25,7 @@ class StringValidator extends AbstractValidator
         return $this;
     }
 
-    public function setMax($max) : self
+    public function setMax($max): self
     {
         if (\intval($max) <= 0) {
             throw new \InvalidArgumentException('Invalid max param value');
@@ -32,7 +34,7 @@ class StringValidator extends AbstractValidator
         return $this;
     }
 
-    public function setLength($length) : self
+    public function setLength($length): self
     {
         if (\intval($length) <= 0) {
             throw new \InvalidArgumentException('Invalid length param value');
@@ -49,22 +51,22 @@ class StringValidator extends AbstractValidator
 
     public function validate($value, array $context = []): bool
     {
-        if ($this->skipOnEmpty and $this->isEmptyValue($value)) {
+        if ($this->skipOnEmpty && $this->isEmptyValue($value)) {
             return true;
         }
         if (!\is_string($value)) {
             return false;
         }
         $length = \mb_strlen($value, $this->encoding);
-        if ($this->length !== null and $this->length != $length) {
+        if ($this->length !== null && $this->length != $length) {
             $this->message = 'Invalid string length';
             return false;
         }
-        if ($this->min !== null and $this->min > $length) {
+        if ($this->min !== null && $this->min > $length) {
             $this->message = 'String length is too short';
             return false;
         }
-        if ($this->max !== null and $this->max < $length) {
+        if ($this->max !== null && $this->max < $length) {
             $this->message = 'String length is too long';
             return false;
         }

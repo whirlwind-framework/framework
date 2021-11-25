@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Domain\Validation\Factory;
 
@@ -35,7 +37,7 @@ class ValidatorFactory
         'date' => DateTimeValidator::class,
     ];
 
-    public function create(string $validatorName, array $params = []) : ValidatorInterface
+    public function create(string $validatorName, array $params = []): ValidatorInterface
     {
         if (!isset($this->validators[$validatorName])) {
             throw new \InvalidArgumentException("Validator $validatorName not supported");

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Hydrator\Strategy;
 
@@ -11,7 +13,7 @@ class EnumObjectStrategy implements StrategyInterface
     public function __construct(string $enumName)
     {
         if (!\is_subclass_of($enumName, Enum::class)) {
-            throw new \InvalidArgumentException;
+            throw new \InvalidArgumentException();
         }
         $this->enumName = $enumName;
     }

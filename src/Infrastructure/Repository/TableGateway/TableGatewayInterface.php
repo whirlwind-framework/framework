@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Repository\TableGateway;
 
@@ -6,10 +8,16 @@ interface TableGatewayInterface
 {
     public function queryOne(array $conditions, array $relations = []): ?array;
 
-    public function queryAll(array $conditions, array $order = [], int $limit = 0, int $offset = 0, array $relations = []): array;
+    public function queryAll(
+        array $conditions,
+        array $order = [],
+        int $limit = 0,
+        int $offset = 0,
+        array $relations = []
+    ): array;
 
     /**
-     * @return array Array of primary keys
+     * @return array|null Array of primary keys
      */
     public function insert(array $data): ?array;
 

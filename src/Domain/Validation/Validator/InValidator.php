@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Domain\Validation\Validator;
 
@@ -12,9 +14,10 @@ class InValidator extends AbstractValidator
 
     public function setValidSet($value): self
     {
-        if (!\is_array($value)
-            and !($value instanceof \Closure)
-            and !($value instanceof \Traversable)
+        if (
+            !\is_array($value)
+            && !($value instanceof \Closure)
+            && !($value instanceof \Traversable)
         ) {
             throw new \InvalidArgumentException(
                 'Invalid validSet property value. Value must be either array or \Closure or \Traversable'
@@ -26,12 +29,12 @@ class InValidator extends AbstractValidator
 
     public function validate($value, array $context = []): bool
     {
-        if ($this->skipOnEmpty and ($value === null || $value === [] || $value === '')) {
+        if ($this->skipOnEmpty && ($value === null || $value === [] || $value === '')) {
             return true;
         }
         if ($this->validSet instanceof \Closure) {
             $this->validSet = $this->validSet();
-            if (!\is_array($this->validSet) and !($this->validSet instanceof \Traversable)) {
+            if (!\is_array($this->validSet) && !($this->validSet instanceof \Traversable)) {
                 throw new \InvalidArgumentException(
                     'Invalid validSet callback.'
                 );

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Hydrator\Accessor;
 
@@ -31,7 +33,7 @@ class MethodAccessor implements AccessorInterface
         $properties = [];
         $methods = \get_class_methods($object);
         foreach ($methods as $method) {
-            if (\strpos($method, 'get') === 0 and \is_callable($object, $method)) {
+            if (\strpos($method, 'get') === 0 && \is_callable($object, $method)) {
                 $properties[] = \lcfirst(\substr($method, 3));
             }
         }
