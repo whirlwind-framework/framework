@@ -18,7 +18,7 @@ class LeagueApplicationFactoryAdapter implements ApplicationFactoryInterface
             $container = new Container();
             $container->delegate($c);
         }
-        $container->addServiceProvider(LeagueApplicationServiceProviderAdapter::class);
+        $container->addServiceProvider(new LeagueApplicationServiceProviderAdapter());
         return new Application($container);
     }
 }
