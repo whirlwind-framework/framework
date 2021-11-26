@@ -47,7 +47,7 @@ class Application implements RequestHandlerInterface
         return $this->router->map($method, $path, $handler);
     }
 
-    public function addMidleware($middleware)
+    public function addMiddleware($middleware)
     {
         if ($middleware instanceof MiddlewareInterface) {
             return $this->router->middleware($middleware);
