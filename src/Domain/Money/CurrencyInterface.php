@@ -6,7 +6,8 @@ namespace Whirlwind\Domain\Money;
 
 interface CurrencyInterface
 {
+    /**
+     * @return string
+     */
     public function getCode(): string;
-
-    public function equals(CurrencyInterface $other): bool;
 }
