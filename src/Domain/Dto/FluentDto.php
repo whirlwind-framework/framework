@@ -66,6 +66,7 @@ abstract class FluentDto implements DtoInterface
     /**
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();

@@ -52,6 +52,7 @@ abstract class Dto implements DtoInterface
     /**
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();
