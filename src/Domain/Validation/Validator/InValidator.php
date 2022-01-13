@@ -33,7 +33,7 @@ class InValidator extends AbstractValidator
             return true;
         }
         if ($this->validSet instanceof \Closure) {
-            $this->validSet = $this->validSet();
+            $this->validSet = ($this->validSet)();
             if (!\is_array($this->validSet) && !($this->validSet instanceof \Traversable)) {
                 throw new \InvalidArgumentException(
                     'Invalid validSet callback.'
@@ -51,6 +51,6 @@ class InValidator extends AbstractValidator
         if (\is_array($this->validSet)) {
             $in = \in_array($value, $this->validSet);
         }
-        return $this->notIn !== $in ? true : false;
+        return $this->notIn !== $in;
     }
 }

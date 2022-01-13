@@ -20,7 +20,7 @@ class Hydrator
         $this->accessor = $accessor;
     }
 
-    public function setAccessor(AccessorInterface $accessor)
+    public function setAccessor(AccessorInterface $accessor): void
     {
         $this->accessor = $accessor;
     }
@@ -34,14 +34,14 @@ class Hydrator
     public function hydrate($target, array $data): object
     {
         $reflection = $this->getReflectionClass($target);
-        $object = \is_object($target) ? $target : $reflection->newInstanceWithoutConstructor();
+        $isTargetObject = \is_object($target);
+        $object = $isTargetObject ? $target : $reflection->newInstanceWithoutConstructor();
 
         foreach ($data as $name => $value) {
             if (isset($this->strategies[$name])) {
                 $oldValue = null;
-                $extract = $this->extract($object, [$name]);
-                if (!empty($extract[$name])) {
-                    $oldValue = $extract[$name];
+                if ($isTargetObject) {
+                    $oldValue = $this->extract($object, [$name])[$name] ?? null;
                 }
                 $value = $this->strategies[$name]->hydrate($value, $data, $oldValue);
             }
@@ -54,7 +54,7 @@ class Hydrator
     {
         $reflection = $this->getReflectionClass(\get_class($object));
         $result = [];
-        if (empty($fields)) {
+        if ($fields === []) {
             $fields = $this->accessor->getPropertyNames($object, $reflection);
         }
         foreach ($fields as $name) {

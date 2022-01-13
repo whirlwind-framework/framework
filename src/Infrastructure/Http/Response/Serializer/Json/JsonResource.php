@@ -32,6 +32,7 @@ class JsonResource implements \JsonSerializable
         return $data;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->serialize($this->extractor->extract($this->decorated));

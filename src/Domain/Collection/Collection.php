@@ -27,7 +27,7 @@ class Collection implements CollectionInterface
         $this->items[] = $item;
     }
 
-    public function offsetSet($key, $item)
+    public function offsetSet($key, $item): void
     {
         if (!($item instanceof $this->entityClass)) {
             throw new \InvalidArgumentException("Invalid object provided. Expected: " . $this->entityClass);
@@ -39,13 +39,14 @@ class Collection implements CollectionInterface
         }
     }
 
-    public function offsetUnset($key)
+    public function offsetUnset($key): void
     {
         if (\array_key_exists($key, $this->items)) {
             unset($this->items[$key]);
         }
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         if (\array_key_exists($key, $this->items)) {
@@ -69,6 +70,7 @@ class Collection implements CollectionInterface
         \reset($this->items);
     }
 
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return \current($this->items);
@@ -79,6 +81,7 @@ class Collection implements CollectionInterface
         \next($this->items);
     }
 
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return \key($this->items);
@@ -101,7 +104,7 @@ class Collection implements CollectionInterface
     {
         $first = \reset($this->items);
 
-        return false == $first ? null : $first;
+        return $first === false ? null : $first;
     }
 
     /**
@@ -111,7 +114,7 @@ class Collection implements CollectionInterface
     {
         $last = \end($this->items);
 
-        return false === $last ? null : $last;
+        return $last === false ? null : $last;
     }
 
     /**

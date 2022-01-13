@@ -66,6 +66,7 @@ class DataProvider implements DataProviderInterface, \JsonSerializable
         return $this->pagination;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return [

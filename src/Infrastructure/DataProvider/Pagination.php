@@ -44,6 +44,7 @@ class Pagination implements PaginationInterface, \JsonSerializable
         return $this->numberOfPages;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return [
