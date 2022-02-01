@@ -40,7 +40,7 @@ class Request
                 if (\is_numeric($name)) {
                     $params[] = $param;
                 } else {
-                    $params['_aliases'][$name] = isset($matches[2]) ? $matches[2] : true;
+                    $params['_aliases'][$name] = $matches[2] ?? true;
                     $prevOption = &$params['_aliases'][$name];
                 }
             } elseif ($prevOption === true) {
@@ -57,8 +57,8 @@ class Request
     {
         $params = [];
         if (isset($_SERVER['argv'])) {
-            $this->_params = $_SERVER['argv'];
-            \array_shift($this->_params);
+            $params = $_SERVER['argv'];
+            \array_shift($params);
         }
         return $params;
     }

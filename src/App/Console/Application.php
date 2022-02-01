@@ -10,7 +10,7 @@ class Application
 {
     protected ContainerInterface $container;
 
-    protected $commands = [];
+    protected array $commands = [];
 
     public function __construct(
         ContainerInterface $container
@@ -29,7 +29,7 @@ class Application
     protected function getHandler(string $route): CommandInterface
     {
         if (!isset($this->commands[$route])) {
-            throw new \RuntimeException('Invalide route: ' . $route);
+            throw new \RuntimeException('Invalid route: ' . $route);
         }
         return $this->container->get($this->commands[$route]);
     }
