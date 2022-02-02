@@ -4,52 +4,42 @@ declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Repository\Rest;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\RequestOptions;
+use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\UriFactoryInterface;
+use Psr\Http\Message\UriInterface;
 use Whirlwind\Infrastructure\Hydrator\Hydrator;
 use Whirlwind\Infrastructure\Repository\Rest\Exception\ClientException;
 use Whirlwind\Infrastructure\Repository\Rest\Exception\ServerException;
 
 class Repository
 {
-    /**
-     * @var Hydrator
-     */
-    protected $hydrator;
+    protected Hydrator $hydrator;
 
-    /**
-     * @var Client
-     */
-    protected $client;
+    protected UriFactoryInterface $uriFactory;
 
-    /**
-     * @var string
-     */
-    protected $modelClass;
+    protected RequestFactoryInterface $requestFactory;
 
-    protected $endpoint;
+    protected ClientInterface $client;
 
-    /**
-     * @var array
-     */
-    protected $headers;
+    protected string $modelClass;
 
-    /**
-     * RestRepository constructor.
-     * @param Hydrator $hydrator
-     * @param Client $client
-     * @param string $modelClass
-     * @param string $collectionClass
-     * @param string $endpoint
-     */
+    protected string $endpoint;
+
+    protected array $headers;
+
     public function __construct(
         Hydrator $hydrator,
-        Client $client,
+        UriFactoryInterface $uriFactory,
+        RequestFactoryInterface $requestFactory,
+        ClientInterface $client,
         string $modelClass,
         string $endpoint
     ) {
         $this->hydrator = $hydrator;
+        $this->uriFactory = $uriFactory;
+        $this->requestFactory = $requestFactory;
         $this->client = $client;
         $this->modelClass = $modelClass;
         $this->endpoint = $endpoint;
@@ -58,15 +48,16 @@ class Repository
     public function findById($id): object
     {
         $url = \rtrim($this->endpoint, '/') . '/' . $id;
-        $response = $this->request('get', $url);
+        $response = $this->request('GET', $this->uriFactory->createUri($url));
         return $this->hydrator->hydrate($this->modelClass, $response['body']);
     }
 
     public function findAll(
         array $conditions = []
     ): array {
-        $url = \rtrim($this->endpoint, '/');
-        $response = $this->request('get', $url, [RequestOptions::QUERY => $conditions]);
+        $uri = $this->uriFactory->createUri(\rtrim($this->endpoint, '/'))
+            ->withQuery(implode('&', $conditions));
+        $response = $this->request('GET', $uri);
         $result = [];
         foreach ($response['body'] as $item) {
             $result[] = $this->hydrator->hydrate($this->modelClass, $item);
@@ -74,20 +65,12 @@ class Repository
         return $result;
     }
 
-    /**
-     * @param string $header
-     * @param string $value
-     * @return $this
-     */
     public function addHeader(string $header, string $value)
     {
         $this->headers[$header] = $value;
         return $this;
     }
 
-    /**
-     * @param string $token
-     */
     public function addToken(string $token)
     {
         if (!empty($token)) {
@@ -95,27 +78,31 @@ class Repository
         }
     }
 
-    /**
-     * @param string $method
-     * @param string $url
-     * @param array $params
-     * @return array
-     */
-    protected function request(string $method, string $url, array $params = []): array
+    protected function request(string $method, UriInterface $uri): array
     {
         $this->addHeader('Accept', 'application/json');
-        $params['headers'] = $this->headers;
+
+        $request = $this->requestFactory->createRequest($method, $uri);
+
+        foreach ($this->headers as $headerName => $headerValue) {
+            $request = $request->withAddedHeader($headerName, $headerValue);
+        }
 
         try {
-            /** @var \Psr\Http\Message\ResponseInterface $userRequest */
-            $userRequest = $this->client->{$method}($url, $params);
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $message = $this->formatResponseExceptionMessage($e);
-            throw new ClientException($e->getResponse()->getStatusCode(), $message);
-        } catch (\GuzzleHttp\Exception\ServerException $e) {
-            $message = $this->formatResponseExceptionMessage($e);
-            throw new ServerException($message, $e->getResponse()->getStatusCode());
-        } catch (\Exception $e) {
+            $userRequest = $this->client->sendRequest($request);
+        } catch (ClientExceptionInterface $e) {
+            $level = (int) \floor($e->getCode() / 100);
+
+            if ($level === 4) {
+                $message = $this->formatResponseExceptionMessage($e);
+                throw new ClientException($e->getCode(), $message);
+            }
+
+            if ($level === 5) {
+                $message = $this->formatResponseExceptionMessage($e);
+                throw new ServerException($message, $e->getCode());
+            }
+
             $message = \sprintf('Failed to to perform request to service (%s).', $e->getMessage());
             throw new ServerException($message, $e->getCode());
         }
@@ -128,26 +115,11 @@ class Repository
         ];
     }
 
-    /**
-     * @param BadResponseException $e
-     * @return string
-     */
-    private function formatResponseExceptionMessage(BadResponseException $e): string
+    private function formatResponseExceptionMessage(ClientExceptionInterface $e): string
     {
-        $message = \sprintf(
-            'Service responded with error (%s - %s).',
-            $e->getResponse()->getStatusCode(),
-            $e->getResponse()->getReasonPhrase()
-        );
-        $message .= "\n" . $e->getResponse()->getBody()->getContents();
-
-        return $message;
+        return "Service responded with error ({$e->getCode()}).\n{$e->getMessage()}";
     }
 
-    /**
-     * @param array $response
-     * @return array
-     */
     public function generateHeaders(array $response): array
     {
         $headers = [];
