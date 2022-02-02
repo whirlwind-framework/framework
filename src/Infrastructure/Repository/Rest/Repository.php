@@ -7,6 +7,8 @@ namespace Whirlwind\Infrastructure\Repository\Rest;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
 use Whirlwind\Infrastructure\Hydrator\Hydrator;
@@ -56,7 +58,7 @@ class Repository
         array $conditions = []
     ): array {
         $uri = $this->uriFactory->createUri(\rtrim($this->endpoint, '/'))
-            ->withQuery(implode('&', $conditions));
+            ->withQuery(http_build_query($conditions));
         $response = $this->request('GET', $uri);
         $result = [];
         foreach ($response['body'] as $item) {
@@ -78,46 +80,64 @@ class Repository
         }
     }
 
-    protected function request(string $method, UriInterface $uri): array
+    /**
+     * @throws \Throwable
+     */
+    protected function request(string $method, UriInterface $uri, StreamInterface $body = null): array
     {
         $this->addHeader('Accept', 'application/json');
 
         $request = $this->requestFactory->createRequest($method, $uri);
+
+        if ($body !== null) {
+            $request = $request->withBody($body);
+        }
 
         foreach ($this->headers as $headerName => $headerValue) {
             $request = $request->withAddedHeader($headerName, $headerValue);
         }
 
         try {
-            $userRequest = $this->client->sendRequest($request);
+            $response = $this->client->sendRequest($request);
         } catch (ClientExceptionInterface $e) {
-            $level = (int) \floor($e->getCode() / 100);
-
-            if ($level === 4) {
-                $message = $this->formatResponseExceptionMessage($e);
-                throw new ClientException($e->getCode(), $message);
-            }
-
-            if ($level === 5) {
-                $message = $this->formatResponseExceptionMessage($e);
-                throw new ServerException($message, $e->getCode());
-            }
-
             $message = \sprintf('Failed to to perform request to service (%s).', $e->getMessage());
             throw new ServerException($message, $e->getCode());
         }
 
-        $data = \json_decode($userRequest->getBody()->getContents(), true);
+        if ($response->getStatusCode() > 399) {
+            throw $this->createException($response);
+        }
+
+        $data = \json_decode($response->getBody()->getContents(), true);
 
         return [
-            'headers' => $userRequest->getHeaders(),
+            'headers' => $response->getHeaders(),
             'body' => $data
         ];
     }
 
-    private function formatResponseExceptionMessage(ClientExceptionInterface $e): string
+    private function createException(ResponseInterface $responseWithException): \Throwable
     {
-        return "Service responded with error ({$e->getCode()}).\n{$e->getMessage()}";
+        $responseCodeLevel = (int) \floor($responseWithException->getStatusCode() / 100);
+        $message = $this->formatResponseExceptionMessage($responseWithException);
+
+        if ($responseCodeLevel === 4) {
+            throw new ClientException($responseWithException->getStatusCode(), $message);
+        }
+
+        throw new ServerException($responseWithException->getStatusCode(), $message);
+    }
+
+    private function formatResponseExceptionMessage(ResponseInterface $responseWithException): string
+    {
+        $message = \sprintf(
+            'Service responded with error (%s - %s).',
+            $responseWithException->getStatusCode(),
+            $responseWithException->getReasonPhrase()
+        );
+        $message .= "\n" . $responseWithException->getBody()->getContents();
+
+        return $message;
     }
 
     public function generateHeaders(array $response): array
