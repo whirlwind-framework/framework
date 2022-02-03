@@ -58,7 +58,7 @@ class Repository
         array $conditions = []
     ): array {
         $uri = $this->uriFactory->createUri(\rtrim($this->endpoint, '/'))
-            ->withQuery(http_build_query($conditions));
+            ->withQuery(\http_build_query($conditions));
         $response = $this->request('GET', $uri);
         $result = [];
         foreach ($response['body'] as $item) {
