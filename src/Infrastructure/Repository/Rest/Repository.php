@@ -116,19 +116,19 @@ class Repository
         ];
     }
 
-    private function createException(ResponseInterface $responseWithException): \Throwable
+    protected function createException(ResponseInterface $responseWithException): \Throwable
     {
         $responseCodeLevel = (int) \floor($responseWithException->getStatusCode() / 100);
         $message = $this->formatResponseExceptionMessage($responseWithException);
 
         if ($responseCodeLevel === 4) {
-            throw new ClientException($responseWithException->getStatusCode(), $message);
+            return new ClientException($responseWithException->getStatusCode(), $message);
         }
 
-        throw new ServerException($responseWithException->getStatusCode(), $message);
+        return new ServerException($responseWithException->getStatusCode(), $message);
     }
 
-    private function formatResponseExceptionMessage(ResponseInterface $responseWithException): string
+    protected function formatResponseExceptionMessage(ResponseInterface $responseWithException): string
     {
         $message = \sprintf(
             'Service responded with error (%s - %s).',
