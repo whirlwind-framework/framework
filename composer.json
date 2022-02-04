@@ -23,7 +23,7 @@
         "laminas/laminas-httphandlerrunner": "2.*",
         "league/container": "4.2.0",
         "psr/cache": "^1.0",
-        "psr/http-client": "^1.0",
+        "psr/http-client": "^1.0.x-dev",
         "ext-mbstring": "*"
     },
     "require-dev": {
