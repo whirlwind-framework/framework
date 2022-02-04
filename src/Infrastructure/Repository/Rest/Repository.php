@@ -4,52 +4,44 @@ declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Repository\Rest;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\RequestOptions;
+use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\UriFactoryInterface;
+use Psr\Http\Message\UriInterface;
 use Whirlwind\Infrastructure\Hydrator\Hydrator;
 use Whirlwind\Infrastructure\Repository\Rest\Exception\ClientException;
 use Whirlwind\Infrastructure\Repository\Rest\Exception\ServerException;
 
 class Repository
 {
-    /**
-     * @var Hydrator
-     */
-    protected $hydrator;
+    protected Hydrator $hydrator;
 
-    /**
-     * @var Client
-     */
-    protected $client;
+    protected UriFactoryInterface $uriFactory;
 
-    /**
-     * @var string
-     */
-    protected $modelClass;
+    protected RequestFactoryInterface $requestFactory;
 
-    protected $endpoint;
+    protected ClientInterface $client;
 
-    /**
-     * @var array
-     */
-    protected $headers;
+    protected string $modelClass;
 
-    /**
-     * RestRepository constructor.
-     * @param Hydrator $hydrator
-     * @param Client $client
-     * @param string $modelClass
-     * @param string $collectionClass
-     * @param string $endpoint
-     */
+    protected string $endpoint;
+
+    protected array $headers;
+
     public function __construct(
         Hydrator $hydrator,
-        Client $client,
+        UriFactoryInterface $uriFactory,
+        RequestFactoryInterface $requestFactory,
+        ClientInterface $client,
         string $modelClass,
         string $endpoint
     ) {
         $this->hydrator = $hydrator;
+        $this->uriFactory = $uriFactory;
+        $this->requestFactory = $requestFactory;
         $this->client = $client;
         $this->modelClass = $modelClass;
         $this->endpoint = $endpoint;
@@ -58,15 +50,16 @@ class Repository
     public function findById($id): object
     {
         $url = \rtrim($this->endpoint, '/') . '/' . $id;
-        $response = $this->request('get', $url);
+        $response = $this->request('GET', $this->uriFactory->createUri($url));
         return $this->hydrator->hydrate($this->modelClass, $response['body']);
     }
 
     public function findAll(
         array $conditions = []
     ): array {
-        $url = \rtrim($this->endpoint, '/');
-        $response = $this->request('get', $url, [RequestOptions::QUERY => $conditions]);
+        $uri = $this->uriFactory->createUri(\rtrim($this->endpoint, '/'))
+            ->withQuery(\http_build_query($conditions));
+        $response = $this->request('GET', $uri);
         $result = [];
         foreach ($response['body'] as $item) {
             $result[] = $this->hydrator->hydrate($this->modelClass, $item);
@@ -74,20 +67,12 @@ class Repository
         return $result;
     }
 
-    /**
-     * @param string $header
-     * @param string $value
-     * @return $this
-     */
     public function addHeader(string $header, string $value)
     {
         $this->headers[$header] = $value;
         return $this;
     }
 
-    /**
-     * @param string $token
-     */
     public function addToken(string $token)
     {
         if (!empty($token)) {
@@ -96,58 +81,65 @@ class Repository
     }
 
     /**
-     * @param string $method
-     * @param string $url
-     * @param array $params
-     * @return array
+     * @throws \Throwable
      */
-    protected function request(string $method, string $url, array $params = []): array
+    protected function request(string $method, UriInterface $uri, StreamInterface $body = null): array
     {
         $this->addHeader('Accept', 'application/json');
-        $params['headers'] = $this->headers;
+
+        $request = $this->requestFactory->createRequest($method, $uri);
+
+        if ($body !== null) {
+            $request = $request->withBody($body);
+        }
+
+        foreach ($this->headers as $headerName => $headerValue) {
+            $request = $request->withAddedHeader($headerName, $headerValue);
+        }
 
         try {
-            /** @var \Psr\Http\Message\ResponseInterface $userRequest */
-            $userRequest = $this->client->{$method}($url, $params);
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $message = $this->formatResponseExceptionMessage($e);
-            throw new ClientException($e->getResponse()->getStatusCode(), $message);
-        } catch (\GuzzleHttp\Exception\ServerException $e) {
-            $message = $this->formatResponseExceptionMessage($e);
-            throw new ServerException($message, $e->getResponse()->getStatusCode());
-        } catch (\Exception $e) {
+            $response = $this->client->sendRequest($request);
+        } catch (ClientExceptionInterface $e) {
             $message = \sprintf('Failed to to perform request to service (%s).', $e->getMessage());
             throw new ServerException($message, $e->getCode());
         }
 
-        $data = \json_decode($userRequest->getBody()->getContents(), true);
+        if ($response->getStatusCode() > 399) {
+            throw $this->createException($response);
+        }
+
+        $data = \json_decode($response->getBody()->getContents(), true);
 
         return [
-            'headers' => $userRequest->getHeaders(),
+            'headers' => $response->getHeaders(),
             'body' => $data
         ];
     }
 
-    /**
-     * @param BadResponseException $e
-     * @return string
-     */
-    private function formatResponseExceptionMessage(BadResponseException $e): string
+    protected function createException(ResponseInterface $responseWithException): \Throwable
+    {
+        $responseCodeLevel = (int) \floor($responseWithException->getStatusCode() / 100);
+        $message = $this->formatResponseExceptionMessage($responseWithException);
+
+        if ($responseCodeLevel === 4) {
+            return new ClientException($responseWithException->getStatusCode(), $message);
+        }
+
+        return new ServerException($responseWithException->getStatusCode(), $message);
+    }
+
+    protected function formatResponseExceptionMessage(ResponseInterface $responseWithException): string
     {
         $message = \sprintf(
             'Service responded with error (%s - %s).',
-            $e->getResponse()->getStatusCode(),
-            $e->getResponse()->getReasonPhrase()
+            $responseWithException->getStatusCode(),
+            $responseWithException->getReasonPhrase()
         );
-        $message .= "\n" . $e->getResponse()->getBody()->getContents();
+        $message .= "\n" . $responseWithException->getBody()->getContents();
 
         return $message;
     }
 
-    /**
-     * @param array $response
-     * @return array
-     */
     public function generateHeaders(array $response): array
     {
         $headers = [];

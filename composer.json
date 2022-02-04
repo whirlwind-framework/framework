@@ -22,9 +22,9 @@
         "laminas/laminas-diactoros": "2.*",
         "laminas/laminas-httphandlerrunner": "2.*",
         "league/container": "4.2.0",
-        "guzzlehttp/guzzle": "~6.0",
         "psr/cache": "^1.0",
-      "ext-mbstring": "*"
+        "psr/http-client": "^1.0.x-dev",
+        "ext-mbstring": "*"
     },
     "require-dev": {
         "dg/bypass-finals": "^1.2",
