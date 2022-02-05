@@ -62,7 +62,7 @@ abstract class AbstractCacheProvider implements ProviderInterface
     public function has($key)
     {
         $value = $this->get($key);
-        return $value !== false;
+        return $value !== false; // TODO: null value returns true
     }
 
     public function add($key, $value, $ttl = null)

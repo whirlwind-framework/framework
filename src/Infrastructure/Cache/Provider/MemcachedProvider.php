@@ -16,7 +16,7 @@ class MemcachedProvider extends AbstractCacheProvider
             ]];
         }
 
-        $this->cache = new \Memcached(($server['persistentId'] ?? 1));
+        $this->cache = new \Memcached(($server['persistentId'] ?? '1'));
         foreach ($config['servers'] as $server) {
             $this->cache->addServer(
                 $server['host'],
@@ -24,5 +24,12 @@ class MemcachedProvider extends AbstractCacheProvider
                 $server['weight']
             );
         }
+    }
+
+    public function has($key)
+    {
+        $this->cache->get($key);
+
+        return \Memcached::RES_NOTFOUND !== $this->cache->getResultCode();
     }
 }
