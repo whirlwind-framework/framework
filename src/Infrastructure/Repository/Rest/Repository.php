@@ -125,19 +125,17 @@ class Repository
             return new ClientException($responseWithException->getStatusCode(), $message);
         }
 
-        return new ServerException($responseWithException->getStatusCode(), $message);
+        return new ServerException($message, $responseWithException->getStatusCode());
     }
 
     protected function formatResponseExceptionMessage(ResponseInterface $responseWithException): string
     {
-        $message = \sprintf(
-            'Service responded with error (%s - %s).',
+        return \sprintf(
+            'Service responded with error (%s - %s). %s',
             $responseWithException->getStatusCode(),
-            $responseWithException->getReasonPhrase()
+            $responseWithException->getReasonPhrase(),
+            $responseWithException->getBody()->getContents()
         );
-        $message .= "\n" . $responseWithException->getBody()->getContents();
-
-        return $message;
     }
 
     public function generateHeaders(array $response): array
