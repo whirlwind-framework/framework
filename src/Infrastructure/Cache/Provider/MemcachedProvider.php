@@ -32,4 +32,9 @@ class MemcachedProvider extends AbstractCacheProvider
 
         return \Memcached::RES_NOTFOUND !== $this->cache->getResultCode();
     }
+
+    public function set($key, $value, $ttl = null)
+    {
+        return $this->cache->set($key, $value, $ttl);
+    }
 }
