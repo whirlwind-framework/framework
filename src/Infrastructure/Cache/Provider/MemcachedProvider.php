@@ -6,25 +6,25 @@ namespace Whirlwind\Infrastructure\Cache\Provider;
 
 class MemcachedProvider extends AbstractCacheProvider
 {
-    private const DEFAULT_SERVER_CONFIG = [
-        'host' => '127.0.0.1',
-        'port' => 11211,
-        'weight' => 0
-    ];
-
     public function __construct(array $config = [])
     {
         if (empty($config['servers'])) {
-            $config['servers'] = [static::DEFAULT_SERVER_CONFIG];
+            $config['servers'] = [[
+                'host' => '127.0.0.1',
+                'port' => 11211,
+                'weight' => 0
+            ]];
         }
 
         $this->cache = new \Memcached(($config['persistentId'] ?? '1'));
         foreach ($config['servers'] as $server) {
-            $this->cache->addServer(
-                $server['host'] ?? static::DEFAULT_SERVER_CONFIG['host'],
-                $server['port'] ?? static::DEFAULT_SERVER_CONFIG['port'],
-                $server['weight'] ?? static::DEFAULT_SERVER_CONFIG['weight']
-            );
+            if (isset($server['host'], $server['port'], $server['weight'])) {
+                $this->cache->addServer(
+                    $server['host'],
+                    $server['port'],
+                    $server['weight']
+                );
+            }
         }
     }
 
