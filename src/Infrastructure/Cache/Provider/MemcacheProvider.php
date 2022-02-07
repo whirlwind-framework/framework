@@ -21,7 +21,7 @@ class MemcacheProvider extends AbstractCacheProvider
         $this->cache = new Memcache();
 
         foreach ($config['servers'] as $server) {
-            if (isset($server['host'], $server['port'], $server['weight'])) {
+            if (isset($server['host'], $server['port'])) {
                 $this->cache->addServer(
                     $server['host'],
                     $server['port'],
