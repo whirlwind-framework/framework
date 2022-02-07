@@ -101,7 +101,7 @@ class Repository
             $response = $this->client->sendRequest($request);
         } catch (ClientExceptionInterface $e) {
             $message = \sprintf('Failed to to perform request to service (%s).', $e->getMessage());
-            throw new ServerException($message, $e->getCode());
+            throw new ServerException(500, $message, $e->getCode());
         }
 
         if ($response->getStatusCode() > 399) {
@@ -125,7 +125,7 @@ class Repository
             return new ClientException($responseWithException->getStatusCode(), $message);
         }
 
-        return new ServerException($message, $responseWithException->getStatusCode());
+        return new ServerException($responseWithException->getStatusCode(), $message);
     }
 
     protected function formatResponseExceptionMessage(ResponseInterface $responseWithException): string
