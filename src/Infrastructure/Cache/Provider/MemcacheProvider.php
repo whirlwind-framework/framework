@@ -14,8 +14,7 @@ class MemcacheProvider extends AbstractCacheProvider
             $config['servers'] = [[
                 'host' => '127.0.0.1',
                 'port' => 11211,
-                'persistent' => true,
-                'weight' => 0,
+                'weight' => 1,
             ]];
         }
 
@@ -26,8 +25,8 @@ class MemcacheProvider extends AbstractCacheProvider
                 $this->cache->addServer(
                     $server['host'],
                     $server['port'],
-                    $server['persistent'] ?? true,
-                    $server['weight']
+                    true,
+                    $server['weight'] ?? 1
                 );
             }
         }
