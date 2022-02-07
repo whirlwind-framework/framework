@@ -101,7 +101,7 @@ class Repository
             $response = $this->client->sendRequest($request);
         } catch (ClientExceptionInterface $e) {
             $message = \sprintf('Failed to to perform request to service (%s).', $e->getMessage());
-            throw new ServerException($message, $e->getCode());
+            throw new ServerException(500, $message, $e->getCode());
         }
 
         if ($response->getStatusCode() > 399) {
@@ -130,14 +130,12 @@ class Repository
 
     protected function formatResponseExceptionMessage(ResponseInterface $responseWithException): string
     {
-        $message = \sprintf(
-            'Service responded with error (%s - %s).',
+        return \sprintf(
+            'Service responded with error (%s - %s). %s',
             $responseWithException->getStatusCode(),
-            $responseWithException->getReasonPhrase()
+            $responseWithException->getReasonPhrase(),
+            $responseWithException->getBody()->getContents()
         );
-        $message .= "\n" . $responseWithException->getBody()->getContents();
-
-        return $message;
     }
 
     public function generateHeaders(array $response): array
