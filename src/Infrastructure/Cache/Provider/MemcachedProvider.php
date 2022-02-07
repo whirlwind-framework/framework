@@ -18,7 +18,7 @@ class MemcachedProvider extends AbstractCacheProvider
             $config['servers'] = [static::DEFAULT_SERVER_CONFIG];
         }
 
-        $this->cache = new \Memcached(($server['persistentId'] ?? '1'));
+        $this->cache = new \Memcached(($config['persistentId'] ?? '1'));
         foreach ($config['servers'] as $server) {
             $this->cache->addServer(
                 $server['host'] ?? static::DEFAULT_SERVER_CONFIG['host'],
