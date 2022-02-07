@@ -8,7 +8,7 @@ use Laminas\Diactoros\ResponseFactory;
 use League\Container\ReflectionContainer;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
-use League\Route\Strategy\ApplicationStrategy;
+use League\Route\Strategy\StrategyInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Whirlwind\App\Application\ApplicationServiceProviderInterface;
 use Whirlwind\App\Http\Adapter\LaminasServerRequestFactoryAdapter;
@@ -52,7 +52,7 @@ class LeagueApplicationServiceProviderAdapter extends AbstractServiceProvider im
         $container->add(
             RouterInterface::class,
             function () use ($container) {
-                $strategy = (new ApplicationStrategy())->setContainer($container);
+                $strategy = $container->get(StrategyInterface::class)->setContainer($container);
                 return (new LeagueRouterAdapter())->setStrategy($strategy);
             }
         )->setShared();
