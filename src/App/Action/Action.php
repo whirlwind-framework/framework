@@ -31,9 +31,7 @@ abstract class Action
     public function __invoke(ServerRequestInterface $request, array $args = []): ResponseInterface
     {
         $this->request = $request;
-        $this->response = $this->responseFactory
-            ->createResponse()
-            ->withHeader('Content-type', 'application/json');
+        $this->response = $this->responseFactory->createResponse();
         $this->args = $args;
         $result = $this->action();
 
