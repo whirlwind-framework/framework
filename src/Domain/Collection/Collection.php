@@ -129,4 +129,14 @@ class Collection implements CollectionInterface
 
         return $copy;
     }
+
+    /**
+     * @param callable $callback
+     * @param $initial
+     * @return mixed|null
+     */
+    public function reduce(callable $callback, $initial = null)
+    {
+        return \array_reduce($this->items, $callback, $initial);
+    }
 }
