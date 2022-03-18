@@ -27,4 +27,13 @@ abstract class Enum
     {
         return $this->value;
     }
+
+    /**
+     * @param Enum $value
+     * @return bool
+     */
+    public function equals(Enum $value): bool
+    {
+        return $value instanceof static && $value->getValue() === $this->value;
+    }
 }

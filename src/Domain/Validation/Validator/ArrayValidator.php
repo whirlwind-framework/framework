@@ -29,6 +29,7 @@ class ArrayValidator extends AbstractValidator
         }
         if ($this->size !== null && $this->size !== \sizeof($value)) {
             $this->message = 'Expected array size: ' . $this->size . '. Actual: ' . \sizeof($value);
+            return false;
         }
         return true;
     }
