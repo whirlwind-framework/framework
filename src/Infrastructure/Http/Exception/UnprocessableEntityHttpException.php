@@ -6,7 +6,7 @@ namespace Whirlwind\Infrastructure\Http\Exception;
 
 class UnprocessableEntityHttpException extends HttpException
 {
-    public function __construct($message = null, $code = 0, \Exception $previous = null)
+    public function __construct(string $message = 'Unprocessable entity.', $code = 0, \Exception $previous = null)
     {
         parent::__construct(422, $message, $code, $previous);
     }
