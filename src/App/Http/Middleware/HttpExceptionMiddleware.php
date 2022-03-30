@@ -45,6 +45,21 @@ class HttpExceptionMiddleware implements MiddlewareInterface
                 ->getBody()
                 ->write($this->serializer->serialize($data));
             return $response;
+        } catch (\Throwable $e) {
+            $response = $this->responseFactory->createResponse();
+            $data = [
+                'message' => $e->getMessage(),
+                'status' => 500,
+                'code' => $e->getCode()
+            ];
+            if ($this->showDebug) {
+                $data = \array_merge($data, ['stackTrace' => $e->getTraceAsString()]);
+            }
+            $response
+                ->withStatus(500)
+                ->getBody()
+                ->write($this->serializer->serialize($data));
+            return $response;
         }
     }
 }

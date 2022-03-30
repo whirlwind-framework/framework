@@ -24,7 +24,8 @@
         "league/container": "4.2.0",
         "psr/cache": "^1.0",
         "psr/http-client": "^1.0.x-dev",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "psr/log": "^1.1"
     },
     "require-dev": {
         "dg/bypass-finals": "^1.2",
