@@ -17,10 +17,13 @@ class ExceptionLoggerMiddleware implements MiddlewareInterface
 
     protected bool $enabled;
 
-    public function __construct(LoggerInterface $logger, bool $enabled = true)
+    protected bool $enableHttpExceptionLogging;
+
+    public function __construct(LoggerInterface $logger, bool $enabled = true, bool $enableHttpExceptionLogging = false)
     {
         $this->logger = $logger;
         $this->enabled = $enabled;
+        $this->enableHttpExceptionLogging = $enableHttpExceptionLogging;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -28,6 +31,12 @@ class ExceptionLoggerMiddleware implements MiddlewareInterface
         try {
             return $handler->handle($request);
         } catch (\Throwable $e) {
+            if (false === $this->enabled) {
+                throw $e;
+            }
+            if ($e instanceof HttpException and false === $this->enableHttpExceptionLogging) {
+                throw $e;
+            }
             $context = [
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),

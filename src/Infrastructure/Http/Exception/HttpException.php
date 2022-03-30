@@ -18,13 +18,4 @@ class HttpException extends \Exception
     {
         return $this->statusCode;
     }
-
-    public function decorate(): array
-    {
-        return [
-            'message' => $this->getMessage(),
-            'status' => $this->getStatusCode(),
-            'code' => $this->getCode()
-        ];
-    }
 }

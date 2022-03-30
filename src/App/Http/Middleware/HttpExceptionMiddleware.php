@@ -10,6 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Whirlwind\Infrastructure\Http\Exception\HttpException;
+use Whirlwind\Infrastructure\Http\Exception\UnprocessableEntityHttpException;
 use Whirlwind\Infrastructure\Http\Response\Serializer\SerializerInterface;
 
 class HttpExceptionMiddleware implements MiddlewareInterface
@@ -36,9 +37,16 @@ class HttpExceptionMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         } catch (HttpException $e) {
             $response = $this->responseFactory->createResponse();
-            $data = $e->decorate();
+            $data = [
+                'message' => $e->getMessage(),
+                'status' => $e->getStatusCode(),
+                'code' => $e->getCode()
+            ];
+            if ($e instanceof UnprocessableEntityHttpException) {
+                $data['errors'] = $e->getErrorCollection();
+            }
             if ($this->showDebug) {
-                $data = \array_merge($data, ['stackTrace' => $e->getTraceAsString()]);
+                $data['stackTrace'] = $e->getTraceAsString();
             }
             $response
                 ->withStatus($e->getStatusCode())
@@ -53,7 +61,7 @@ class HttpExceptionMiddleware implements MiddlewareInterface
                 'code' => $e->getCode()
             ];
             if ($this->showDebug) {
-                $data = \array_merge($data, ['stackTrace' => $e->getTraceAsString()]);
+                $data['stackTrace'] = $e->getTraceAsString();
             }
             $response
                 ->withStatus(500)

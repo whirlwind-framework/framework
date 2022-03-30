@@ -34,9 +34,4 @@ class UnprocessableEntityHttpException extends HttpException
     {
         return $this->errorCollection;
     }
-
-    public function decorate(): array
-    {
-        return \array_merge(parent::decorate(), ['errors' => $this->getErrorCollection()]);
-    }
 }
