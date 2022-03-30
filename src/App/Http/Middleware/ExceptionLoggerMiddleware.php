@@ -31,6 +31,7 @@ class ExceptionLoggerMiddleware implements MiddlewareInterface
             $context = [
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),
+                'class' => \get_class($e),
                 'stackTrace' => $e->getTraceAsString()
             ];
             if ($e instanceof HttpException) {
