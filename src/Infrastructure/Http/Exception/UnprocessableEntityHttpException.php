@@ -19,7 +19,7 @@ class UnprocessableEntityHttpException extends HttpException
      */
     public function __construct(
         array $errorCollection = [],
-        string $message = 'Unprocessable entity.',
+        string $message = 'Unprocessable entity',
         $code = 0,
         \Exception $previous = null
     ) {
@@ -33,5 +33,10 @@ class UnprocessableEntityHttpException extends HttpException
     public function getErrorCollection(): array
     {
         return $this->errorCollection;
+    }
+
+    public function decorate(): array
+    {
+        return \array_merge(parent::decorate(), ['errors' => $this->getErrorCollection()]);
     }
 }
