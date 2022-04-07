@@ -18,10 +18,11 @@ class PresenterDataProvider extends DataProvider
         array $conditions = [],
         array $sortFields = [],
         int $limit = DataProviderFactoryInterface::DEFAULT_LIMIT,
-        int $page = 1
+        int $page = 1,
+        array $select = []
     ) {
         $this->presenter = $presenter;
-        parent::__construct($repository, $conditions, $sortFields, $limit, $page);
+        parent::__construct($repository, $conditions, $sortFields, $limit, $page, $select);
     }
 
     protected function loadData()

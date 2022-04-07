@@ -58,7 +58,11 @@ class Repository implements RepositoryInterface
             $relationData = [];
             foreach ($data as $field => $value) {
                 if (str_starts_with($field, $relation->getRelatedCollection() . '_relation_')) {
-                    $fieldName = \str_replace($relation->getRelatedCollection() . '_relation_', '', $field);
+                    $fieldName = \str_replace(
+                        $relation->getRelatedCollection() . '_relation_',
+                        '',
+                        $field
+                    );
                     $relationData[$fieldName] = $value;
                 }
             }
@@ -78,13 +82,13 @@ class Repository implements RepositoryInterface
         }
     }
 
-    public function findOne(array $conditions = [], array $with = []): object
+    public function findOne(array $conditions = [], array $with = [], array $select = []): object
     {
         $relations = [];
         foreach ($with as $relationName) {
             $relations[$relationName] = $this->getRelation($relationName);
         }
-        $data = $this->tableGateway->queryOne($conditions, $relations);
+        $data = $this->tableGateway->queryOne($conditions, $relations, $select);
         if (!\is_array($data)) {
             throw new NotFoundException();
         }
@@ -100,7 +104,8 @@ class Repository implements RepositoryInterface
         array $order = [],
         int $limit = 0,
         int $offset = 0,
-        array $with = []
+        array $with = [],
+        array $select = []
     ): array {
         $result = [];
         $relations = [];
@@ -110,7 +115,7 @@ class Repository implements RepositoryInterface
         if (!empty($relations)) {
             $this->applyRelationStrategies($relations);
         }
-        $data = $this->tableGateway->queryAll($conditions, $order, $limit, $offset, $relations);
+        $data = $this->tableGateway->queryAll($conditions, $order, $limit, $offset, $relations, $select);
         foreach ($data as $row) {
             if (!empty($relations)) {
                 $row = $this->normalizeResultSet($row, $relations);

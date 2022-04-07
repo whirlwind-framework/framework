@@ -17,7 +17,8 @@ class PresenterDataProviderFactory implements PresenterDataProviderFactoryInterf
         array $conditions = [],
         array $sortFields = [],
         int $limit = self::DEFAULT_LIMIT,
-        int $page = 0
+        int $page = 0,
+        array $select = []
     ): DataProviderInterface {
         return new PresenterDataProvider(
             $presenter,
@@ -25,7 +26,8 @@ class PresenterDataProviderFactory implements PresenterDataProviderFactoryInterf
             $conditions,
             $sortFields,
             $limit,
-            $page
+            $page,
+            $select
         );
     }
 }

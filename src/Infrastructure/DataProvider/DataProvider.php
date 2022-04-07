@@ -11,41 +11,69 @@ use Whirlwind\Domain\Repository\RepositoryInterface;
 
 class DataProvider implements DataProviderInterface, \JsonSerializable
 {
-    protected $repository;
+    protected RepositoryInterface $repository;
 
-    protected $conditions;
+    protected array $conditions;
 
-    protected $sortFields;
+    protected array $sortFields;
 
-    protected $limit;
+    protected int $limit;
 
-    protected $page;
+    protected int $page;
 
-    protected $models;
+    protected array $models;
 
-    protected $pagination;
+    protected PaginationInterface $pagination;
 
-    protected $dataLoaded = false;
+    protected bool $dataLoaded = false;
+
+    protected array $select;
 
     public function __construct(
         RepositoryInterface $repository,
         array $conditions = [],
         array $sortFields = [],
         int $limit = DataProviderFactoryInterface::DEFAULT_LIMIT,
-        int $page = 1
+        int $page = 1,
+        array $select = []
     ) {
         $this->repository = $repository;
         $this->conditions = $conditions;
         $this->sortFields = $sortFields;
         $this->limit = $limit;
         $this->page = $page;
+        $this->select = $select;
+    }
+
+    /**
+     * @param array $select
+     */
+    public function setSelect(array $select): void
+    {
+        $this->select = $select;
+    }
+
+    /**
+     * @param string $field
+     * @return void
+     */
+    public function addSelect(string $field): void
+    {
+        $this->select[] = $field;
     }
 
     protected function loadData()
     {
         $total = (int)$this->repository->aggregateCount('', $this->conditions);
         $offset = ($this->page - 1) * $this->limit;
-        $this->models = $this->repository->findAll($this->conditions, $this->sortFields, $this->limit, $offset);
+        $this->models = $this->repository->findAll(
+            $this->conditions,
+            $this->sortFields,
+            $this->limit,
+            $offset,
+            [],
+            $this->select
+        );
         $this->pagination = new Pagination($total, $this->limit, $this->page);
         $this->dataLoaded = true;
     }

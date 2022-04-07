@@ -6,14 +6,15 @@ namespace Whirlwind\Infrastructure\Repository\TableGateway;
 
 interface TableGatewayInterface
 {
-    public function queryOne(array $conditions, array $relations = []): ?array;
+    public function queryOne(array $conditions, array $relations = [], array $select = []): ?array;
 
     public function queryAll(
         array $conditions,
         array $order = [],
         int $limit = 0,
         int $offset = 0,
-        array $relations = []
+        array $relations = [],
+        array $select = []
     ): array;
 
     /**

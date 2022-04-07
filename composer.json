@@ -33,6 +33,7 @@
         "squizlabs/php_codesniffer": "^3.5"
     },
     "autoload": {
+        "files": ["src/polyfill.php"],
         "psr-4": {
             "Whirlwind\\": "src"
         }

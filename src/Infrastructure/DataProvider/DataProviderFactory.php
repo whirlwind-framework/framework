@@ -15,8 +15,9 @@ class DataProviderFactory implements DataProviderFactoryInterface
         array $conditions = [],
         array $sortFields = [],
         int $limit = self::DEFAULT_LIMIT,
-        int $page = 0
+        int $page = 0,
+        array $select = []
     ): DataProviderInterface {
-        return new DataProvider($repository, $conditions, $sortFields, $limit, $page);
+        return new DataProvider($repository, $conditions, $sortFields, $limit, $page, $select);
     }
 }
