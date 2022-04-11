@@ -50,8 +50,8 @@ class MongoTableGateway implements TableGatewayInterface
     {
         if (!isset($data['_id'])) {
             $data['_id'] = new ObjectId();
-        } else {
-            $data['_id'] = $this->isObjectId($data['_id']) ? new ObjectId($data['_id']) : $data['_id'];
+        } elseif ($this->isObjectId($data['_id'])) {
+            $data['_id'] = new ObjectId($data['_id']);
         }
         $newId = $this->connection->getCollection($this->collectionName)->insert($data);
         return ['_id' => $newId];
