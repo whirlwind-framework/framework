@@ -43,14 +43,23 @@ class MongoTableGateway implements TableGatewayInterface
             ->from($this->collectionName)
             ->where($conditions);
         $result = $query->one();
-        return $result ? $result : null;
+        return $result ?: null;
     }
 
     public function insert(array $data): ?array
     {
-        $data['_id'] = new ObjectId();
+        if (!isset($data['_id'])) {
+            $data['_id'] = new ObjectId();
+        } elseif ($this->isObjectId($data['_id'])) {
+            $data['_id'] = new ObjectId($data['_id']);
+        }
         $newId = $this->connection->getCollection($this->collectionName)->insert($data);
         return ['_id' => $newId];
+    }
+
+    private function isObjectId($oid): bool
+    {
+        return \is_string($oid) && 24 === \strlen($oid) && 24 === \strspn($oid, '0123456789ABCDEFabcdef');
     }
 
     public function updateOne(array $data): void
