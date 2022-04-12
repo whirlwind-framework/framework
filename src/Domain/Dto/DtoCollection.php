@@ -6,7 +6,7 @@ namespace Whirlwind\Domain\Dto;
 
 use Whirlwind\Domain\Collection\Collection;
 
-class DtoCollection extends Collection implements ArrayableInterface
+class DtoCollection extends Collection implements DtoInterface
 {
     /**
      * DtoCollection constructor.
@@ -27,8 +27,16 @@ class DtoCollection extends Collection implements ArrayableInterface
      */
     public function toArray(): array
     {
-        return \array_map(static function (ArrayableInterface $dto) {
+        return \array_map(static function (DtoInterface $dto) {
             return $dto->toArray();
         }, $this->items);
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 }

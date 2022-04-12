@@ -41,7 +41,7 @@ abstract class FluentDto implements DtoInterface
                 $val = $this->$accessor();
             }
 
-            if ($val instanceof ArrayableInterface) {
+            if ($val instanceof DtoInterface) {
                 $val = $val->toArray();
             }
 
@@ -66,8 +66,7 @@ abstract class FluentDto implements DtoInterface
     /**
      * @return array
      */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }

@@ -33,7 +33,7 @@ abstract class Dto implements DtoInterface
             if (\method_exists($this, $accessor)) {
                 $data[$key] = $this->$accessor();
             }
-            if ($data[$key] instanceof ArrayableInterface) {
+            if ($data[$key] instanceof DtoInterface) {
                 $data[$key] = $data[$key]->toArray();
             }
         }
@@ -52,8 +52,7 @@ abstract class Dto implements DtoInterface
     /**
      * @return array
      */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }
