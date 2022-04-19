@@ -16,16 +16,11 @@
     "license": "BSD-3-Clause",
     "require": {
         "php": "~7.4||>=8.0",
-        "ext-mongodb": "*",
         "ext-json": "*",
-        "league/route": "5.*",
-        "laminas/laminas-diactoros": "2.*",
-        "laminas/laminas-httphandlerrunner": "2.*",
-        "league/container": "4.2.0",
-        "psr/cache": "^1.0",
-        "psr/http-client": "^1.0.x-dev",
+        "psr/container": "^1.1 || ^2.0",
         "ext-mbstring": "*",
-        "psr/log": "^1.1"
+        "psr/http-server-middleware": "1.0.1",
+        "psr/http-factory": "1.0.1"
     },
     "require-dev": {
         "dg/bypass-finals": "^1.2",

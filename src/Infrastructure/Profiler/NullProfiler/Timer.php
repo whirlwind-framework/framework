@@ -21,9 +21,12 @@ class Timer implements TimerInterface
      */
     protected $tags;
 
-    public function __construct(string $name)
+    public function __construct(string $name, array $tags = [])
     {
         $this->name = $name;
+        $this->start = \microtime(true);
+        $this->stoped = false;
+        $this->tags = $tags;
     }
 
     public function getName(): string
