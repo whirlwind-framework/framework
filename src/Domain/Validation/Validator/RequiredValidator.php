@@ -10,9 +10,6 @@ class RequiredValidator extends AbstractValidator
 
     public function validate($value, array $context = []): bool
     {
-        if (empty($value)) {
-            return false;
-        }
-        return true;
+        return !($value === '' || $value === [] || $value === null);
     }
 }

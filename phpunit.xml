@@ -9,7 +9,7 @@
 
     <testsuites>
         <testsuite name="scenarios">
-            <directory>./tests</directory>
+            <directory>./tests/Unit</directory>
         </testsuite>
     </testsuites>
 
