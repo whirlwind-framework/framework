@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Persistence;
 
-use Whirlwind\Infrastructure\Persistence\ConnectionInterface;
-use Whirlwind\Infrastructure\Persistence\QueryInterface;
-use Whirlwind\Infrastructure\Persistence\ExpressionInterface;
-
 abstract class Query implements QueryInterface
 {
     protected ConnectionInterface $connection;

@@ -48,6 +48,11 @@ class Repository implements RepositoryInterface
         return $relation;
     }
 
+    protected function strStartsWith(string $haystack, string $needle): bool
+    {
+        return 0 === \strncmp($haystack, $needle, \strlen($needle));
+    }
+
     protected function normalizeResultSet(array $data, array $relations): array
     {
         /**
@@ -57,7 +62,7 @@ class Repository implements RepositoryInterface
         foreach ($relations as $property => $relation) {
             $relationData = [];
             foreach ($data as $field => $value) {
-                if (str_starts_with($field, $relation->getRelatedCollection() . '_relation_')) {
+                if ($this->strStartsWith($field, $relation->getRelatedCollection() . '_relation_')) {
                     $fieldName = \str_replace($relation->getRelatedCollection() . '_relation_', '', $field);
                     $relationData[$fieldName] = $value;
                 }

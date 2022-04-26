@@ -20,7 +20,8 @@
         "psr/container": "^1.1 || ^2.0",
         "ext-mbstring": "*",
         "psr/http-server-middleware": "1.0.1",
-        "psr/http-factory": "1.0.1"
+        "psr/http-factory": "1.0.1",
+        "psr/http-client": "1.0.1"
     },
     "require-dev": {
         "dg/bypass-finals": "^1.2",

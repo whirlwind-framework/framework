@@ -26,11 +26,11 @@ final class JsonDecodeMiddleware implements MiddlewareInterface
             return $request->getParsedBody();
         }
 
-        if (strpos($request->getHeaderLine('Content-Type'), 'application/json') === false) {
+        if (\strpos($request->getHeaderLine('Content-Type'), 'application/json') === false) {
             return $request->getParsedBody();
         }
 
-        return json_decode(
+        return \json_decode(
             (string)$request->getBody(),
             true,
             self::DEFAULT_JSON_DEPTH,
