@@ -11,18 +11,13 @@ class Profiler extends AbstractProfiler
 {
     public function flush(): void
     {
+        $this->timers = [];
     }
 
     public function startTimer(string $timerName, array $tags = []): TimerInterface
     {
-        return new Timer($timerName);
-    }
-
-    public function stopTimer(TimerInterface $timer): void
-    {
-    }
-
-    public function stopTimerByName(string $timerName): void
-    {
+        $timer = new Timer($timerName, $this->prepareTags($tags));
+        $this->timers[$timerName] = $timer;
+        return $timer;
     }
 }
