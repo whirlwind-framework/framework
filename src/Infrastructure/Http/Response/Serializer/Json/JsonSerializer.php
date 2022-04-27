@@ -13,7 +13,10 @@ class JsonSerializer implements SerializerInterface
 {
     protected ContainerInterface $container;
 
-    protected array $decorators = [];
+    private array $decorators = [
+        DataProviderInterface::class => DataProviderResource::class,
+        CollectionResource::class => CollectionResource::class
+    ];
 
     protected string $collectionEnvelope = 'items';
 
@@ -23,7 +26,7 @@ class JsonSerializer implements SerializerInterface
         \array_merge($this->decorators, $decorators);
     }
 
-    protected function decorate(object $object): object
+    public function decorate(object $object): object
     {
         if (isset($this->decorators[\get_class($object)])) {
             $decorator = $this->container->get($this->decorators[\get_class($object)]);
@@ -35,20 +38,9 @@ class JsonSerializer implements SerializerInterface
 
     public function serialize($data)
     {
-        $result = $data;
-        if ($data instanceof DataProviderInterface) {
-            $result = [];
-            foreach ($data->getModels() as $model) {
-                $result[$this->collectionEnvelope][] = $this->decorate($model);
-            }
-        } elseif ($data instanceof CollectionInterface) {
-            $result = [];
-            foreach ($data as $model) {
-                $result[$this->collectionEnvelope][] = $this->decorate($model);
-            }
-        } elseif (\is_object($data)) {
-            $result = $this->decorate($data);
+        if (\is_object($data)) {
+            $data = $this->decorate($data);
         }
-        return \json_encode($result);
+        return \json_encode($data);
     }
 }
