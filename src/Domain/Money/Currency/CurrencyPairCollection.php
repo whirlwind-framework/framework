@@ -9,7 +9,7 @@ use Whirlwind\Domain\Money\CurrencyInterface;
 
 /**
  * @method CurrencyPair|false current()
- * @method CurrencyPair|false reduce(callable $callback, $initial = null)
+ * @method CurrencyPair|null reduce(callable $callback, $initial = null)
  */
 class CurrencyPairCollection extends Collection
 {
