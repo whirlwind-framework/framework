@@ -13,15 +13,19 @@ class JsonSerializer implements SerializerInterface
 {
     protected ContainerInterface $container;
 
-    private array $decorators = [
-        DataProviderInterface::class => DataProviderResource::class,
-        CollectionResource::class => CollectionResource::class
-    ];
+    protected array $decorators = [];
 
     public function __construct(ContainerInterface $container, array $decorators = [])
     {
         $this->container = $container;
-        \array_merge($this->decorators, $decorators);
+        $this->decorators = \array_merge(
+            [
+                DataProviderInterface::class => DataProviderResource::class,
+                CollectionResource::class => CollectionResource::class
+            ],
+            $this->decorators,
+            $decorators
+        );
     }
 
     public function decorate(object $object): object
