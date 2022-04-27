@@ -30,7 +30,7 @@ class DataProviderResource extends JsonResource
 
     public function jsonSerialize()
     {
-        $result[$this->collectionEnvelope] = [];
+        $result = [$this->collectionEnvelope => []];
         if (!($this->decorated instanceof DataProviderInterface)) {
             return $result;
         }

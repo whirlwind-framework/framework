@@ -14,43 +14,54 @@ class Request
     {
         $rawParams = $this->getServerParams();
         $endOfOptionsFound = false;
+        $route = '';
         if (isset($rawParams[0])) {
             $route = \array_shift($rawParams);
             if ($route === '--') {
                 $endOfOptionsFound = true;
                 $route = \array_shift($rawParams);
             }
-        } else {
-            $route = '';
         }
+        $this->route = $route;
+        $this->params = $this->extractParams($rawParams, $endOfOptionsFound);
+    }
+
+    protected function extractParams(array $rawParams, bool $endOfOptionsFound): array
+    {
         $params = [];
         $prevOption = null;
         foreach ($rawParams as $param) {
             if ($endOfOptionsFound) {
                 $params[] = $param;
-            } elseif ($param === '--') {
+                continue;
+            }
+            if ($param === '--') {
                 $endOfOptionsFound = true;
-            } elseif (\preg_match('/^--([\w-]+)(?:=(.*))?$/', $param, $matches)) {
+                continue;
+            }
+            if (\preg_match('/^--([\w-]+)(?:=(.*))?$/', $param, $matches)) {
                 $name = $matches[1];
                 if (\is_numeric(\substr($name, 0, 1))) {
                     throw new \Exception('Parameter "' . $name . '" is not valid');
                 }
-            } elseif (\preg_match('/^-([\w-]+)(?:=(.*))?$/', $param, $matches)) {
+                continue;
+            }
+            if (\preg_match('/^-([\w-]+)(?:=(.*))?$/', $param, $matches)) {
                 $name = $matches[1];
-                if (\is_numeric($name)) {
-                    $params[] = $param;
-                } else {
+                $params[] = $param;
+                if (!\is_numeric($name)) {
                     $params['_aliases'][$name] = $matches[2] ?? true;
                     $prevOption = &$params['_aliases'][$name];
                 }
-            } elseif ($prevOption === true) {
-                $prevOption = $param;
-            } else {
-                $params[] = $param;
+                continue;
             }
+            if ($prevOption === true) {
+                $prevOption = $param;
+                continue;
+            }
+            $params[] = $param;
         }
-        $this->route = $route;
-        $this->params = $params;
+        return $params;
     }
 
     public function getServerParams()

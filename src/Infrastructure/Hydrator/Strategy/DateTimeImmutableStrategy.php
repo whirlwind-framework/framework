@@ -13,7 +13,7 @@ class DateTimeImmutableStrategy implements StrategyInterface
     /**
      * @param $value
      * @param array|null $data
-     * @param null $oldValue
+     * @param $oldValue
      *
      * @return DateTimeImmutable|false|null
      */

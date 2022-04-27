@@ -53,7 +53,7 @@ class EnumCollectionStrategy implements StrategyInterface
     /**
      * @param $value
      * @param array|null $data
-     * @param null $oldValue
+     * @param $oldValue
      * @return CollectionInterface
      */
     public function hydrate($value, ?array $data = null, $oldValue = null): CollectionInterface

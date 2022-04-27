@@ -33,7 +33,7 @@ class MethodAccessor implements AccessorInterface
         $properties = [];
         $methods = \get_class_methods($object);
         foreach ($methods as $method) {
-            if (\strpos($method, 'get') === 0 && \is_callable($object, $method)) {
+            if (\strpos($method, 'get') === 0 && \is_callable([$object, $method])) {
                 $properties[] = \lcfirst(\substr($method, 3));
             }
         }

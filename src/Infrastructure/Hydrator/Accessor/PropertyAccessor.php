@@ -17,6 +17,7 @@ class PropertyAccessor implements AccessorInterface
             }
             $property->setValue($object, $value);
         } catch (\ReflectionException $e) {
+            //force ignore errors for case data and entity are incompatible
         }
     }
 
@@ -39,6 +40,7 @@ class PropertyAccessor implements AccessorInterface
             }
             return $property->getValue($object);
         } catch (\ReflectionException $e) {
+            //force ignore errors for case data and entity are incompatible
         }
     }
 
