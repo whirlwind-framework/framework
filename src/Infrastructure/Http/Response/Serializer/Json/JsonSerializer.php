@@ -18,8 +18,6 @@ class JsonSerializer implements SerializerInterface
         CollectionResource::class => CollectionResource::class
     ];
 
-    protected string $collectionEnvelope = 'items';
-
     public function __construct(ContainerInterface $container, array $decorators = [])
     {
         $this->container = $container;
