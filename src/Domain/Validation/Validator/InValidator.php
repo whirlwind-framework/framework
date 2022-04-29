@@ -6,7 +6,7 @@ namespace Whirlwind\Domain\Validation\Validator;
 
 class InValidator extends AbstractValidator
 {
-    protected $validSet = [];
+    protected $validSet;
 
     protected $notIn = false;
 

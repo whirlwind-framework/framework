@@ -8,8 +8,8 @@ class RegularExpressionValidator extends AbstractValidator
 {
     /** @var string  */
     protected $message = 'Value does not match the pattern';
-    /** @var string|null  */
-    protected $pattern = null;
+
+    protected $pattern = '';
 
     /**
      * @param $value

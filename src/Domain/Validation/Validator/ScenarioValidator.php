@@ -59,7 +59,6 @@ class ScenarioValidator extends AbstractValidator
     }
 
     /**
-     * @param DtoInterface|array $value
      * @return bool
      * @throws ValidateException
      */
