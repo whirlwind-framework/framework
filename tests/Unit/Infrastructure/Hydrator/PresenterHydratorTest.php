@@ -48,7 +48,7 @@ class PresenterHydratorTest extends TestCase
                 ],
             ],
             [
-                'entity' => new StubEntity(new StubEntity('value')),
+                'entity' => new StubEntity(new StubEntity('test')),
                 'expected' => [
                     'value' => [
                         'value' => 'test',
