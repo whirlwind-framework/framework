@@ -6,15 +6,15 @@ namespace Whirlwind\Infrastructure\Presenter;
 
 use Whirlwind\Domain\Dto\DtoInterface;
 use Whirlwind\Domain\Presenter\PresenterInterface;
-use Whirlwind\Infrastructure\Hydrator\Hydrator;
+use Whirlwind\Infrastructure\Hydrator\PresenterHydrator;
 
 class Presenter implements PresenterInterface
 {
-    protected $hydrator;
+    protected PresenterHydrator $hydrator;
 
-    protected $dtoName;
+    protected string $dtoName;
 
-    public function __construct(Hydrator $hydrator, string $dtoName)
+    public function __construct(PresenterHydrator $hydrator, string $dtoName)
     {
         $this->hydrator = $hydrator;
         $this->dtoName = $dtoName;
