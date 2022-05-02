@@ -5,6 +5,7 @@
         bootstrap="./vendor/autoload.php"
         colors="true"
         verbose="true"
+        cacheResult="false"
         stopOnFailure="true">
 
     <testsuites>
