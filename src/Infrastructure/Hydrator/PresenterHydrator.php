@@ -39,7 +39,7 @@ class PresenterHydrator extends Hydrator
     {
         $result = [];
         foreach ($items as $key => $value) {
-            $result[$key] = $this->extract($value);
+            $result[$key] = \is_object($value) ? $this->extract($value) : $value;
         }
 
         return $result;
