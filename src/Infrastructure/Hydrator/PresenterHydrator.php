@@ -4,8 +4,20 @@ declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Hydrator;
 
+use Whirlwind\Infrastructure\Hydrator\Extractor\ExtractorInterface;
+
 class PresenterHydrator extends Hydrator
 {
+    /**
+     * @var ExtractorInterface[]
+     */
+    protected array $extractors = [];
+
+    public function addExtractor(ExtractorInterface $extractor): void
+    {
+        $this->extractors[] = $extractor;
+    }
+
     public function extract(object $object, array $fields = []): array
     {
         $reflection = $this->getReflectionClass(\get_class($object));
@@ -20,7 +32,7 @@ class PresenterHydrator extends Hydrator
             } elseif (\is_iterable($result[$name])) {
                 $result[$name] = $this->extractIterable($result[$name]);
             } elseif (\is_object($result[$name])) {
-                $result[$name] = $this->extract($result[$name]);
+                $result[$name] = $this->extractObject($result[$name]);
             }
         }
         return $result;
@@ -39,9 +51,26 @@ class PresenterHydrator extends Hydrator
     {
         $result = [];
         foreach ($items as $key => $value) {
-            $result[$key] = \is_object($value) ? $this->extract($value) : $value;
+            if (\is_iterable($value)) {
+                $result[$key] = $this->extractIterable($value);
+            } elseif (\is_object($value)) {
+                $result[$key] = $this->extractObject($value);
+            } else {
+                $result[$key] = $value;
+            }
         }
 
         return $result;
+    }
+
+    protected function extractObject(object $object)
+    {
+        foreach ($this->extractors as $extractor) {
+            if ($extractor->isExtractable($object)) {
+                return $extractor->extract($object);
+            }
+        }
+
+        return $this->extract($object);
     }
 }
