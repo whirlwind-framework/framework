@@ -36,7 +36,7 @@ class Timer implements TimerInterface
 
     public function getStart(): float
     {
-        return $this->start;
+        return (float)$this->start;
     }
 
     public function stop(): void
