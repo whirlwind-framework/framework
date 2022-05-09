@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Repository;
 
+use Whirlwind\Domain\Collection\Collection;
+use Whirlwind\Domain\Collection\CollectionInterface;
 use Whirlwind\Domain\Repository\RepositoryInterface;
-use Whirlwind\Domain\Repository\ResultInterface;
 use Whirlwind\Infrastructure\Hydrator\Hydrator;
 use Whirlwind\Infrastructure\Hydrator\Strategy\ObjectStrategy;
 use Whirlwind\Infrastructure\Repository\Exception\InsertException;
@@ -107,7 +108,7 @@ class Repository implements RepositoryInterface
         int $limit = 0,
         int $offset = 0,
         array $with = []
-    ): ResultInterface {
+    ): CollectionInterface {
         $relations = [];
         foreach ($with as $relationName) {
             $relations[$relationName] = $this->getRelation($relationName);
@@ -122,7 +123,7 @@ class Repository implements RepositoryInterface
             }
             $result[$key] = $this->hydrator->hydrate($this->modelClass, $row);
         }
-        return $result;
+        return new Collection($this->modelClass, $result);
     }
 
     public function aggregate($column, $operator, array $conditions): string

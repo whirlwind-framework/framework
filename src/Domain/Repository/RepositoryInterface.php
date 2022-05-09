@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Whirlwind\Domain\Repository;
 
+use Whirlwind\Domain\Collection\CollectionInterface;
+
 interface RepositoryInterface
 {
     public function findOne(array $conditions = [], array $with = []): object;
@@ -14,7 +16,7 @@ interface RepositoryInterface
         int $limit = 0,
         int $offset = 0,
         array $with = []
-    ): ResultInterface;
+    ): CollectionInterface;
 
     public function aggregate($column, $operator, array $conditions);
 

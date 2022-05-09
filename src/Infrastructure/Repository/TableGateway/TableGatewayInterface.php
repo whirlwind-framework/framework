@@ -16,7 +16,7 @@ interface TableGatewayInterface
         int $limit = 0,
         int $offset = 0,
         array $relations = []
-    ): ResultInterface;
+    ): array;
 
     /**
      * @return array|null Array of primary keys
