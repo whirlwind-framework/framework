@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Repository\TableGateway;
 
+use Whirlwind\Domain\Repository\ResultInterface;
+
 interface TableGatewayInterface
 {
     public function queryOne(array $conditions, array $relations = []): ?array;
@@ -14,7 +16,7 @@ interface TableGatewayInterface
         int $limit = 0,
         int $offset = 0,
         array $relations = []
-    ): array;
+    ): ResultInterface;
 
     /**
      * @return array|null Array of primary keys
