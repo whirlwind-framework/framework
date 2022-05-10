@@ -7,7 +7,6 @@ namespace Whirlwind\Infrastructure\Http\Response\Serializer\Json;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Whirlwind\Domain\DataProvider\DataProviderInterface;
-use Whirlwind\Infrastructure\Hydrator\Hydrator;
 
 class DataProviderResource extends JsonResource
 {
@@ -24,7 +23,7 @@ class DataProviderResource extends JsonResource
         string $modelDecorator,
         string $collectionEnvelope = 'items'
     ) {
-        if (!($modelDecorator instanceof JsonResource)) {
+        if (!\is_a($modelDecorator, JsonResource::class, true)) {
             throw new \InvalidArgumentException("Decorator $modelDecorator is not of JsonResource type");
         }
         $this->container = $container;

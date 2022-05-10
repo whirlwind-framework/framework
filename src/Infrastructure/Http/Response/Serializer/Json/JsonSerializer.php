@@ -20,7 +20,7 @@ class JsonSerializer implements SerializerInterface
         $this->container = $container;
         $this->decorators = \array_merge($this->decorators, $decorators);
         foreach ($this->decorators as $decorator) {
-            if (!($decorator instanceof JsonResource)) {
+            if (!\is_a($decorator, JsonResource::class, true)) {
                 throw new \InvalidArgumentException("Decorator $decorator is not of JsonResource type");
             }
         }
