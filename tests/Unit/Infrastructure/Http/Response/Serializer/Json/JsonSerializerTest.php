@@ -6,6 +6,9 @@ namespace Test\Unit\Infrastructure\Http\Response\Serializer\Json;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamInterface;
 use Test\Unit\Infrastructure\Http\Response\Serializer\Json\Stub\UserResourceStub;
 use Test\Unit\Infrastructure\Http\Response\Serializer\Json\Stub\UserStub;
 use Whirlwind\Infrastructure\Http\Response\Serializer\Json\JsonSerializer;
@@ -44,8 +47,30 @@ class JsonSerializerTest extends TestCase
             ->method('get')
             ->with($this->equalTo(UserResourceStub::class))
             ->will($this->returnValue(new UserResourceStub(new Hydrator(new PropertyAccessor()))));
-        $result = $this->serializer->serialize($user);
+        $stream = $this->getMockBuilder(StreamInterface::class)
+            ->onlyMethods(['write', '__toString', 'close', 'detach', 'getSize', 'tell', 'eof', 'isSeekable', 'seek', 'rewind', 'isWritable', 'isReadable', 'read', 'getContents', 'getMetadata'])
+            ->getMock();
         $expected = \json_encode(['id' => $id, 'userName' => $userName]);
-        $this->assertEquals($expected, $result);
+        $stream
+            ->expects($this->once())
+            ->method('write')
+            ->with($this->equalTo($expected));
+        $response = $this->getMockBuilder(ResponseInterface::class)
+            ->onlyMethods(['getBody', 'getStatusCode', 'withStatus', 'getReasonPhrase', 'getProtocolVersion', 'withProtocolVersion', 'getHeaders', 'hasHeader', 'getHeader', 'getHeaderLine', 'withHeader', 'withAddedHeader', 'withoutHeader', 'withBody'])
+            ->getMock();
+        $response
+            ->expects($this->once())
+            ->method('getBody')
+            ->will($this->returnValue($stream));
+        $response
+            ->expects($this->once())
+            ->method('withHeader')
+            ->with($this->equalTo('Content-Type'), $this->equalTo('application/json'))
+            ->will($this->returnValue(clone $response));
+        $result = $this->serializer->serialize(
+            $this->getMockBuilder(ServerRequestInterface::class)->getMock(),
+            $response,
+            $user
+        );
     }
 }

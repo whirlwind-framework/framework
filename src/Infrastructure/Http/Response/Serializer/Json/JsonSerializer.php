@@ -36,6 +36,6 @@ class JsonSerializer implements SerializerInterface
         }
         $data = \json_encode($data);
         $response->getBody()->write($data);
-        return $response;
+        return $response->withHeader('Content-Type', 'application/json');
     }
 }
