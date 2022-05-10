@@ -46,7 +46,7 @@ class DataProviderResource extends JsonResource
             /** @var JsonResource $decorator */
             $decorator = $this->container->get($this->modelDecorator);
             $response = $decorator->decorate($response, $model);
-            $result[$this->collectionEnvelope][] = $decorator;
+            $this->result[$this->collectionEnvelope][] = $decorator;
         }
         return $response;
     }
