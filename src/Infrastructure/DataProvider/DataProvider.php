@@ -45,7 +45,9 @@ class DataProvider implements DataProviderInterface, \JsonSerializable
     {
         $total = (int)$this->repository->aggregateCount('', $this->conditions);
         $offset = ($this->page - 1) * $this->limit;
-        $this->models = $this->repository->findAll($this->conditions, $this->sortFields, $this->limit, $offset);
+        $this->models = \iterator_to_array(
+            $this->repository->findAll($this->conditions, $this->sortFields, $this->limit, $offset)
+        );
         $this->pagination = new Pagination($total, $this->limit, $this->page);
         $this->dataLoaded = true;
     }
