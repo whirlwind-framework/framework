@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Whirlwind\Infrastructure\Repository;
 
 use Whirlwind\Domain\Repository\RepositoryInterface;
+use Whirlwind\Domain\Repository\ResultFactoryInterface;
+use Whirlwind\Domain\Repository\ResultInterface;
 use Whirlwind\Infrastructure\Hydrator\Hydrator;
 use Whirlwind\Infrastructure\Hydrator\Strategy\ObjectStrategy;
 use Whirlwind\Infrastructure\Repository\Exception\InsertException;
@@ -16,23 +18,27 @@ use Whirlwind\Infrastructure\Repository\TableGateway\TableGatewayInterface;
 
 class Repository implements RepositoryInterface
 {
-    protected $tableGateway;
+    protected TableGatewayInterface $tableGateway;
 
-    protected $hydrator;
+    protected Hydrator $hydrator;
 
-    protected $modelClass;
+    protected string $modelClass;
 
-    protected $relationCollection;
+    protected ?RelationCollection $relationCollection;
+
+    protected ResultFactoryInterface $resultFactory;
 
     public function __construct(
         TableGatewayInterface $tableGateway,
         Hydrator $hydrator,
         string $modelClass,
+        ResultFactoryInterface $resultFactory,
         RelationCollection $relationCollection = null
     ) {
         $this->tableGateway = $tableGateway;
         $this->hydrator = $hydrator;
         $this->modelClass = $modelClass;
+        $this->resultFactory = $resultFactory;
         $this->relationCollection = $relationCollection;
     }
 
@@ -106,8 +112,7 @@ class Repository implements RepositoryInterface
         int $limit = 0,
         int $offset = 0,
         array $with = []
-    ): array {
-        $result = [];
+    ): ResultInterface {
         $relations = [];
         foreach ($with as $relationName) {
             $relations[$relationName] = $this->getRelation($relationName);
@@ -115,12 +120,14 @@ class Repository implements RepositoryInterface
         if (!empty($relations)) {
             $this->applyRelationStrategies($relations);
         }
-        $data = $this->tableGateway->queryAll($conditions, $order, $limit, $offset, $relations);
-        foreach ($data as $row) {
+        $result = $this->resultFactory->create(
+            $this->tableGateway->queryAll($conditions, $order, $limit, $offset, $relations)
+        );
+        foreach ($result as $key => $row) {
             if (!empty($relations)) {
                 $row = $this->normalizeResultSet($row, $relations);
             }
-            $result[] = $this->hydrator->hydrate($this->modelClass, $row);
+            $result[$key] = $this->hydrator->hydrate($this->modelClass, $row);
         }
         return $result;
     }

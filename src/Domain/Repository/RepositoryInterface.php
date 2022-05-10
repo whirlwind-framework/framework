@@ -14,7 +14,7 @@ interface RepositoryInterface
         int $limit = 0,
         int $offset = 0,
         array $with = []
-    ): array;
+    ): ResultInterface;
 
     public function aggregate($column, $operator, array $conditions);
 
