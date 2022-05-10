@@ -4,39 +4,53 @@ declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Http\Response\Serializer\Json;
 
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
 use Whirlwind\Domain\Collection\CollectionInterface;
-use Whirlwind\Infrastructure\Hydrator\Hydrator;
 
 class CollectionResource extends JsonResource
 {
-    protected $serializer;
+    protected $container;
+
+    protected ?string $modelDecorator;
 
     protected string $collectionEnvelope;
 
-    public function __construct(Hydrator $extractor, JsonSerializer $serializer, string $collectionEnvelope = 'items')
-    {
-        $this->serializer = $serializer;
+    protected $result;
+
+    public function __construct(
+        ContainerInterface $container,
+        ?string $modelDecorator = null,
+        string $collectionEnvelope = 'items'
+    ) {
+        if (null !== $modelDecorator and !\is_a($modelDecorator, JsonResource::class, true)) {
+            throw new \InvalidArgumentException("Decorator $modelDecorator is not of JsonResource type");
+        }
+        $this->container = $container;
+        $this->modelDecorator = $modelDecorator;
         $this->collectionEnvelope = $collectionEnvelope;
-        parent::__construct($extractor);
+        $this->result = [$this->collectionEnvelope => []];
     }
 
-    public function decorate(object $decorated): void
+    public function decorate(ResponseInterface $response, object $decorated): ResponseInterface
     {
         if (!($decorated instanceof CollectionInterface)) {
             throw new \InvalidArgumentException('Decorated object must implement CollectionInterface');
         }
-        parent::decorate($decorated);
+        foreach ($this->decorated as $model) {
+            $item = $model;
+            if (null !== $this->modelDecorator) {
+                /** @var JsonResource $item */
+                $item = $this->container->get($this->modelDecorator);
+                $response = $item->decorate($response, $model);
+            }
+            $this->result[$this->collectionEnvelope][] = $item;
+        }
+        return $response;
     }
 
     public function jsonSerialize()
     {
-        $result = [$this->collectionEnvelope => []];
-        if (!($this->decorated instanceof CollectionInterface)) {
-            return $result;
-        }
-        foreach ($this->decorated as $model) {
-            $result[$this->collectionEnvelope][] = $this->serializer->decorate($model);
-        }
-        return $result;
+        return $this->result;
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Whirlwind\Infrastructure\Http\Response\Serializer\Json;
 
+use Psr\Http\Message\ResponseInterface;
 use Whirlwind\Infrastructure\Hydrator\Hydrator;
 
 class JsonResource implements \JsonSerializable
@@ -19,9 +20,10 @@ class JsonResource implements \JsonSerializable
         $this->extractor = $extractor;
     }
 
-    public function decorate(object $decorated): void
+    public function decorate(ResponseInterface $response, object $decorated): ResponseInterface
     {
         $this->decorated = $decorated;
+        return $response;
     }
 
     protected function serialize(array $data): array
