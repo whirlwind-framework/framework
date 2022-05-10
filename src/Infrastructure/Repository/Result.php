@@ -55,7 +55,11 @@ class Result implements ResultInterface
 
     public function offsetSet($offset, $value)
     {
-        return $this->items[$offset] = $value;
+        if (null === $offset) {
+            $this->items[] = $value;
+        }
+
+        $this->items[$offset] = $value;
     }
 
     public function offsetUnset($offset)

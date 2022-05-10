@@ -24,7 +24,7 @@ class Repository implements RepositoryInterface
 
     protected string $modelClass;
 
-    protected RelationCollection $relationCollection;
+    protected ?RelationCollection $relationCollection;
 
     protected ResultFactoryInterface $resultFactory;
 
