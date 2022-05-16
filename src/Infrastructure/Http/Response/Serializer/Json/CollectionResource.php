@@ -10,13 +10,13 @@ use Whirlwind\Domain\Collection\CollectionInterface;
 
 class CollectionResource extends JsonResource
 {
-    protected $container;
+    protected ContainerInterface $container;
 
     protected ?string $modelDecorator;
 
     protected string $collectionEnvelope;
 
-    protected $result;
+    protected array $result;
 
     public function __construct(
         ContainerInterface $container,
@@ -37,7 +37,7 @@ class CollectionResource extends JsonResource
         if (!($decorated instanceof CollectionInterface)) {
             throw new \InvalidArgumentException('Decorated object must implement CollectionInterface');
         }
-        foreach ($this->decorated as $model) {
+        foreach ($decorated as $model) {
             $item = $model;
             if (null !== $this->modelDecorator) {
                 /** @var JsonResource $item */
