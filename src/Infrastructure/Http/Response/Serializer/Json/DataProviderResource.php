@@ -14,6 +14,8 @@ class DataProviderResource extends JsonResource
 
     protected string $collectionEnvelope;
 
+    protected string $metaEnvelope;
+
     protected ContainerInterface $container;
 
     protected $result;
@@ -21,7 +23,8 @@ class DataProviderResource extends JsonResource
     public function __construct(
         ContainerInterface $container,
         ?string $modelDecorator,
-        string $collectionEnvelope = 'items'
+        string $collectionEnvelope = 'items',
+        string $metaEnvelope = 'meta'
     ) {
         if (null !== $modelDecorator and !\is_a($modelDecorator, JsonResource::class, true)) {
             throw new \InvalidArgumentException("Decorator $modelDecorator is not of JsonResource type");
@@ -29,7 +32,11 @@ class DataProviderResource extends JsonResource
         $this->container = $container;
         $this->modelDecorator = $modelDecorator;
         $this->collectionEnvelope = $collectionEnvelope;
-        $this->result = [$this->collectionEnvelope => []];
+        $this->metaEnvelope = $metaEnvelope;
+        $this->result = [];
+        if (!empty($this->collectionEnvelope)) {
+            $this->result = [$this->collectionEnvelope => []];
+        }
     }
 
     public function decorate(ResponseInterface $response, object $decorated): ResponseInterface
@@ -49,7 +56,19 @@ class DataProviderResource extends JsonResource
                 $item = $this->container->get($this->modelDecorator);
                 $response = $item->decorate($response, $model);
             }
-            $this->result[$this->collectionEnvelope][] = $item;
+            if (!empty($this->collectionEnvelope)) {
+                $this->result[$this->collectionEnvelope][] = $item;
+            } else {
+                $this->result[] = $item;
+            }
+        }
+        if (!empty($this->collectionEnvelope) and !empty($this->metaEnvelope)) {
+            $this->result[$this->metaEnvelope] = [
+                'totalCount' => $decorated->getPagination()->getTotal(),
+                'pageCount' => $decorated->getPagination()->getNumberOfPages(),
+                'currentPage' => $decorated->getPagination()->getPage(),
+                'perPage' => $decorated->getPagination()->getPageSize()
+            ];
         }
         return $response;
     }

@@ -14,8 +14,6 @@ class Relation
 
     protected $relatedCollection;
 
-    protected $relatedModel;
-
     protected $relationType;
 
     public function __construct(
@@ -23,14 +21,12 @@ class Relation
         string $field,
         string $relatedField,
         string $relatedCollection,
-        string $relatedModel,
         string $relationType
     ) {
         $this->property = $property;
         $this->field = $field;
         $this->relatedField = $relatedField;
         $this->relatedCollection = $relatedCollection;
-        $this->relatedModel = $relatedModel;
         $this->relationType = $relationType;
     }
 
@@ -52,11 +48,6 @@ class Relation
     public function getRelatedCollection(): string
     {
         return $this->relatedCollection;
-    }
-
-    public function getRelatedModel(): string
-    {
-        return $this->relatedModel;
     }
 
     public function getRelationType(): string
