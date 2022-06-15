@@ -33,4 +33,6 @@ interface QueryInterface
     public function limit(int $limit): self;
 
     public function offset(int $offset): self;
+
+    public function from(string $collectionName): self;
 }

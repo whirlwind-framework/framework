@@ -6,14 +6,13 @@ namespace Whirlwind\Domain\Repository;
 
 interface RepositoryInterface
 {
-    public function findOne(array $conditions = [], array $with = []): object;
+    public function findOne(array $conditions = []): object;
 
     public function findAll(
         array $conditions = [],
         array $order = [],
         int $limit = 0,
-        int $offset = 0,
-        array $with = []
+        int $offset = 0
     ): ResultInterface;
 
     public function aggregate($column, $operator, array $conditions);

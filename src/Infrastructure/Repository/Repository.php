@@ -8,12 +8,9 @@ use Whirlwind\Domain\Repository\RepositoryInterface;
 use Whirlwind\Domain\Repository\ResultFactoryInterface;
 use Whirlwind\Domain\Repository\ResultInterface;
 use Whirlwind\Infrastructure\Hydrator\Hydrator;
-use Whirlwind\Infrastructure\Hydrator\Strategy\ObjectStrategy;
 use Whirlwind\Infrastructure\Repository\Exception\InsertException;
 use Whirlwind\Infrastructure\Repository\Exception\InvalidModelClassException;
 use Whirlwind\Infrastructure\Repository\Exception\NotFoundException;
-use Whirlwind\Infrastructure\Repository\Relation\Relation;
-use Whirlwind\Infrastructure\Repository\Relation\RelationCollection;
 use Whirlwind\Infrastructure\Repository\TableGateway\TableGatewayInterface;
 
 class Repository implements RepositoryInterface
@@ -24,84 +21,25 @@ class Repository implements RepositoryInterface
 
     protected string $modelClass;
 
-    protected ?RelationCollection $relationCollection;
-
     protected ResultFactoryInterface $resultFactory;
 
     public function __construct(
         TableGatewayInterface $tableGateway,
         Hydrator $hydrator,
         string $modelClass,
-        ResultFactoryInterface $resultFactory,
-        RelationCollection $relationCollection = null
+        ResultFactoryInterface $resultFactory
     ) {
         $this->tableGateway = $tableGateway;
         $this->hydrator = $hydrator;
         $this->modelClass = $modelClass;
         $this->resultFactory = $resultFactory;
-        $this->relationCollection = $relationCollection;
     }
 
-    protected function getRelation($name): Relation
+    public function findOne(array $conditions = []): object
     {
-        if (\is_null($this->relationCollection)) {
-            throw new \InvalidArgumentException("Relation $name do not exist");
-        }
-        $relation = $this->relationCollection->getRelationByProperty($name);
-        if (!($relation instanceof Relation)) {
-            throw new \InvalidArgumentException("Relation $name do not exist");
-        }
-        return $relation;
-    }
-
-    protected function strStartsWith(string $haystack, string $needle): bool
-    {
-        return 0 === \strncmp($haystack, $needle, \strlen($needle));
-    }
-
-    protected function normalizeResultSet(array $data, array $relations): array
-    {
-        /**
-         * @var string $property
-         * @var Relation $relation
-         */
-        foreach ($relations as $property => $relation) {
-            $relationData = [];
-            foreach ($data as $field => $value) {
-                if ($this->strStartsWith($field, $relation->getRelatedCollection() . '_relation_')) {
-                    $fieldName = \str_replace($relation->getRelatedCollection() . '_relation_', '', $field);
-                    $relationData[$fieldName] = $value;
-                }
-            }
-            $data[$property] = $relationData;
-        }
-        return $data;
-    }
-
-    protected function applyRelationStrategies(array $relations)
-    {
-        /**
-         * @var string $property
-         * @var Relation $relation
-         */
-        foreach ($relations as $property => $relation) {
-            $this->hydrator->addStrategy($property, new ObjectStrategy($this->hydrator, $relation->getRelatedModel()));
-        }
-    }
-
-    public function findOne(array $conditions = [], array $with = []): object
-    {
-        $relations = [];
-        foreach ($with as $relationName) {
-            $relations[$relationName] = $this->getRelation($relationName);
-        }
-        $data = $this->tableGateway->queryOne($conditions, $relations);
+        $data = $this->tableGateway->queryOne($conditions);
         if (!\is_array($data)) {
             throw new NotFoundException();
-        }
-        if (!empty($relations)) {
-            $data = $this->normalizeResultSet($data, $relations);
-            $this->applyRelationStrategies($relations);
         }
         return $this->hydrator->hydrate($this->modelClass, $data);
     }
@@ -110,23 +48,12 @@ class Repository implements RepositoryInterface
         array $conditions = [],
         array $order = [],
         int $limit = 0,
-        int $offset = 0,
-        array $with = []
+        int $offset = 0
     ): ResultInterface {
-        $relations = [];
-        foreach ($with as $relationName) {
-            $relations[$relationName] = $this->getRelation($relationName);
-        }
-        if (!empty($relations)) {
-            $this->applyRelationStrategies($relations);
-        }
         $result = $this->resultFactory->create(
-            $this->tableGateway->queryAll($conditions, $order, $limit, $offset, $relations)
+            $this->tableGateway->queryAll($conditions, $order, $limit, $offset)
         );
         foreach ($result as $key => $row) {
-            if (!empty($relations)) {
-                $row = $this->normalizeResultSet($row, $relations);
-            }
             $result[$key] = $this->hydrator->hydrate($this->modelClass, $row);
         }
         return $result;

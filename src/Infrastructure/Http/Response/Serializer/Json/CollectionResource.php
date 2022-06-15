@@ -14,22 +14,18 @@ class CollectionResource extends JsonResource
 
     protected ?string $modelDecorator;
 
-    protected string $collectionEnvelope;
-
     protected array $result;
 
     public function __construct(
         ContainerInterface $container,
-        ?string $modelDecorator = null,
-        string $collectionEnvelope = 'items'
+        ?string $modelDecorator = null
     ) {
         if (null !== $modelDecorator and !\is_a($modelDecorator, JsonResource::class, true)) {
             throw new \InvalidArgumentException("Decorator $modelDecorator is not of JsonResource type");
         }
         $this->container = $container;
         $this->modelDecorator = $modelDecorator;
-        $this->collectionEnvelope = $collectionEnvelope;
-        $this->result = [$this->collectionEnvelope => []];
+        $this->result = [];
     }
 
     public function decorate(ResponseInterface $response, object $decorated): ResponseInterface
@@ -44,7 +40,7 @@ class CollectionResource extends JsonResource
                 $item = $this->container->get($this->modelDecorator);
                 $response = $item->decorate($response, $model);
             }
-            $this->result[$this->collectionEnvelope][] = $item;
+            $this->result[] = $item;
         }
         return $response;
     }
