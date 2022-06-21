@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Test\Unit\Domain\Money\Currency\Exchange;
 
 use DG\BypassFinals;
+use PHPUnit\Framework\TestCase;
 use Whirlwind\Domain\Money\Currency\CurrencyPair;
 use Whirlwind\Domain\Money\Currency\CurrencyPairCollection;
 use Whirlwind\Domain\Money\Currency\Exchange\Exception\UnresolvableCurrencyPairException;
 use Whirlwind\Domain\Money\Currency\Exchange\FixedExchange;
 use Whirlwind\Domain\Money\CurrencyInterface;
-use PHPUnit\Framework\TestCase;
 
 class FixedExchangeTest extends TestCase
 {

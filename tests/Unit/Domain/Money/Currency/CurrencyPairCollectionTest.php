@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Test\Unit\Domain\Money\Currency;
 
 use DG\BypassFinals;
+use PHPUnit\Framework\TestCase;
 use Test\Util\CollectionMockable;
 use Whirlwind\Domain\Money\Currency\CurrencyPair;
 use Whirlwind\Domain\Money\Currency\CurrencyPairCollection;
 use Whirlwind\Domain\Money\CurrencyInterface;
-use PHPUnit\Framework\TestCase;
 
 class CurrencyPairCollectionTest extends TestCase
 {
@@ -115,5 +115,33 @@ class CurrencyPairCollectionTest extends TestCase
         self::assertSame($entity, $actual);
 
         self::assertNull($this->collection->findByBaseAndTarget($base, $newTarget));
+    }
+
+    public function testAddUniquePair()
+    {
+        $base = $this->createMock(CurrencyInterface::class);
+        $target = $this->createMock(CurrencyInterface::class);
+        $entity = $this->createCurrencyPairMock($base, $target);
+        $this->collection->add($entity);
+
+        $base->expects(self::exactly(2))
+            ->method('equals')
+            ->with(self::identicalTo($base))
+            ->willReturn(true);
+
+        $newTarget = $this->createMock(CurrencyInterface::class);
+        $target->expects(self::exactly(2))
+            ->method('equals')
+            ->withConsecutive(
+                [self::identicalTo($target)],
+                [self::identicalTo($newTarget)]
+            )
+            ->willReturnOnConsecutiveCalls(true, false);
+        $this->collection->addUniquePair($entity);
+        self::assertCount(1, $this->collection);
+
+        $newEntity = $this->createCurrencyPairMock($base, $newTarget);
+        $this->collection->addUniquePair($newEntity);
+        self::assertCount(2, $this->collection);
     }
 }

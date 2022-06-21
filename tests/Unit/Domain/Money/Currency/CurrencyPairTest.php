@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Test\Unit\Domain\Money\Currency;
 
 use DG\BypassFinals;
+use PHPUnit\Framework\TestCase;
 use Whirlwind\Domain\Money\Currency\CurrencyPair;
 use Whirlwind\Domain\Money\CurrencyInterface;
-use PHPUnit\Framework\TestCase;
 
 class CurrencyPairTest extends TestCase
 {

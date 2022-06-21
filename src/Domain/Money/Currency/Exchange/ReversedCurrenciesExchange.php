@@ -14,7 +14,7 @@ class ReversedCurrenciesExchange implements ExchangeInterface
     /**
      * @var CurrencyPairCollection
      */
-    private $pairs;
+    private CurrencyPairCollection $pairs;
 
     /**
      * @param CurrencyPairCollection $pairs
@@ -50,6 +50,25 @@ class ReversedCurrenciesExchange implements ExchangeInterface
         }
 
         return $pair;
+    }
+
+    /**
+     * @param CurrencyPair $pair
+     * @return void
+     */
+    public function updateExchangeRate(CurrencyPair $pair): void
+    {
+        $reversedExchangePair = $this->pairs->findByBaseAndTarget($pair->getTarget(), $pair->getBase());
+
+        if ($reversedExchangePair) {
+            $this->pairs->addUniquePair(new CurrencyPair(
+                $pair->getTarget(),
+                $pair->getBase(),
+                $pair->getBaseToTargetRatio()
+            ));
+        } else {
+            $this->pairs->addUniquePair($pair);
+        }
     }
 
     /**

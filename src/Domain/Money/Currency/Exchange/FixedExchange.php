@@ -14,7 +14,7 @@ class FixedExchange implements ExchangeInterface
     /**
      * @var CurrencyPairCollection
      */
-    private $pairs;
+    private CurrencyPairCollection $pairs;
 
     /**
      * @param CurrencyPairCollection $pairs
@@ -39,6 +39,11 @@ class FixedExchange implements ExchangeInterface
         }
 
         return $pair;
+    }
+
+    public function updateExchangeRate(CurrencyPair $pair): void
+    {
+        $this->pairs->addUniquePair($pair);
     }
 
     /**

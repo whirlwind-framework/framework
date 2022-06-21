@@ -15,4 +15,10 @@ interface ExchangeInterface
      * @return CurrencyPair
      */
     public function quote(CurrencyInterface $baseCurrency, CurrencyInterface $counterCurrency): CurrencyPair;
+
+    /**
+     * @param CurrencyPair $pair
+     * @return void
+     */
+    public function updateExchangeRate(CurrencyPair $pair): void;
 }
