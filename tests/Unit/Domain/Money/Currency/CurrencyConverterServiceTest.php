@@ -5,23 +5,19 @@ declare(strict_types=1);
 namespace Test\Unit\Domain\Money\Currency;
 
 use DG\BypassFinals;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Whirlwind\Domain\Money\Currency\CurrencyConverterService;
 use Whirlwind\Domain\Money\Currency\CurrencyPair;
-use Whirlwind\Domain\Money\Currency\CurrencyPairCollection;
-use Whirlwind\Domain\Money\Currency\Exchange\ExchangeFactory;
 use Whirlwind\Domain\Money\Currency\Exchange\ExchangeInterface;
-use Whirlwind\Domain\Money\Currency\Exchange\ExchangeLoaderInterface;
 use Whirlwind\Domain\Money\CurrencyInterface;
 use Whirlwind\Domain\Money\MoneyCalculatorInterface;
 use Whirlwind\Domain\Money\MoneyFactoryInterface;
 use Whirlwind\Domain\Money\MoneyInterface;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
 class CurrencyConverterServiceTest extends TestCase
 {
-    private $exchangeLoader;
-    private $exchangeFactory;
+    private $exchange;
     private $moneyCalculator;
     private $moneyFactory;
     private $converter;
@@ -31,14 +27,12 @@ class CurrencyConverterServiceTest extends TestCase
         BypassFinals::enable();
         parent::setUp();
 
-        $this->exchangeLoader = $this->createMock(ExchangeLoaderInterface::class);
-        $this->exchangeFactory = $this->createMock(ExchangeFactory::class);
+        $this->exchange = $this->createMock(ExchangeInterface::class);
         $this->moneyCalculator = $this->createMock(MoneyCalculatorInterface::class);
         $this->moneyFactory = $this->createMock(MoneyFactoryInterface::class);
 
         $this->converter = new CurrencyConverterService(
-            $this->exchangeLoader,
-            $this->exchangeFactory,
+            $this->exchange,
             $this->moneyCalculator,
             $this->moneyFactory
         );
@@ -55,20 +49,8 @@ class CurrencyConverterServiceTest extends TestCase
             ->with(self::identicalTo($counterCurrency))
             ->willReturn(false);
 
-        $pairs = $this->createMock(CurrencyPairCollection::class);
-        $this->exchangeLoader->expects(self::once())
-            ->method('load')
-            ->with(self::identicalTo($base), self::identicalTo($counterCurrency))
-            ->willReturn($pairs);
-
-        $exchange = $this->createMock(ExchangeInterface::class);
-        $this->exchangeFactory->expects(self::once())
-            ->method('create')
-            ->with(self::identicalTo($pairs))
-            ->willReturn($exchange);
-
         $pair = $this->createMock(CurrencyPair::class);
-        $exchange->expects(self::once())
+        $this->exchange->expects(self::once())
             ->method('quote')
             ->with(self::identicalTo($base), self::identicalTo($counterCurrency))
             ->willReturn($pair);

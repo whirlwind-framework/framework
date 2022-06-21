@@ -21,7 +21,7 @@ class Pagination implements PaginationInterface, \JsonSerializable
         $this->total = $total;
         $this->pageSize = $pageSize;
         $this->page = $page;
-        $this->numberOfPages = (int) (($total + $pageSize - 1) / $pageSize);
+        $this->numberOfPages = 0 !== $pageSize ? (int) (($total + $pageSize - 1) / $pageSize) : 1;
     }
 
     public function getTotal(): int

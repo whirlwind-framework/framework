@@ -8,8 +8,9 @@ use Whirlwind\Domain\Collection\Collection;
 use Whirlwind\Domain\Money\CurrencyInterface;
 
 /**
+ * @property CurrencyPair[] $items
  * @method CurrencyPair|false current()
- * @method CurrencyPair|null reduce(callable $callback, $initial = null)
+ * @method CurrencyPair|false reduce(callable $callback, $initial = null)
  */
 class CurrencyPairCollection extends Collection
 {
@@ -28,13 +29,13 @@ class CurrencyPairCollection extends Collection
      */
     public function findByBaseAndTarget(CurrencyInterface $base, CurrencyInterface $target): ?CurrencyPair
     {
-        return $this->reduce(static function (?CurrencyPair $carry, CurrencyPair $item) use ($base, $target) {
-            if (!$carry && $item->getBase()->equals($base) && $item->getTarget()->equals($target)) {
+        foreach ($this->items as $item) {
+            if ($item->getBase()->equals($base) && $item->getTarget()->equals($target)) {
                 return $item;
             }
+        }
 
-            return $carry;
-        });
+        return null;
     }
 
     /**
@@ -50,5 +51,17 @@ class CurrencyPairCollection extends Collection
         }
 
         return $this;
+    }
+
+    /**
+     * @param CurrencyPair $pair
+     * @return void
+     */
+    public function addUniquePair(CurrencyPair $pair): void
+    {
+        $this->items = $this->filter(static function (CurrencyPair $item) use ($pair) {
+            return !$item->getBase()->equals($pair->getBase()) || !$item->getTarget()->equals($pair->getTarget());
+        })->items;
+        $this->add($pair);
     }
 }
