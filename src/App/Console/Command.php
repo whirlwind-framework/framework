@@ -6,7 +6,7 @@ namespace Whirlwind\App\Console;
 
 abstract class Command implements CommandInterface
 {
-// foreground color control codes
+    // foreground color control codes
     public const FG_BLACK = 30;
     public const FG_RED = 31;
     public const FG_GREEN = 32;
