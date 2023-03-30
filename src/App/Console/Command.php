@@ -52,7 +52,8 @@ abstract class Command implements CommandInterface
 
     private function formatString(string $string, array $format = []): string
     {
-        $code = implode(';', $format);
+        $code = \implode(';', $format);
+
         return "\033[0m" . ($code !== '' ? "\033[" . $code . 'm' : '') . $string . "\033[0m";
     }
 
@@ -90,7 +91,7 @@ abstract class Command implements CommandInterface
     {
         while (true) {
             $this->stdout($message . ' (yes|no) [' . ($default ? 'yes' : 'no') . ']:');
-            $input = trim($this->stdin());
+            $input = \trim($this->stdin());
 
             if (empty($input)) {
                 return $default;
