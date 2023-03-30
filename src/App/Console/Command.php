@@ -37,6 +37,7 @@ abstract class Command implements CommandInterface
     public const FRAMED = 51;
     public const ENCIRCLED = 52;
     public const OVERLINED = 53;
+
     public function __construct()
     {
         \defined('STDIN') or \define('STDIN', \fopen('php://stdin', 'r'));
