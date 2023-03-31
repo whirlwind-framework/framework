@@ -44,11 +44,11 @@ class Request
                 if (\is_numeric(\substr($name, 0, 1))) {
                     throw new \Exception('Parameter "' . $name . '" is not valid');
                 }
+                $params[$name] = $matches[2] ?? true;
                 continue;
             }
             if (\preg_match('/^-([\w-]+)(?:=(.*))?$/', $param, $matches)) {
                 $name = $matches[1];
-                $params[] = $param;
                 if (!\is_numeric($name)) {
                     $params['_aliases'][$name] = $matches[2] ?? true;
                     $prevOption = &$params['_aliases'][$name];
