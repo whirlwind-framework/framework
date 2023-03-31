@@ -44,6 +44,7 @@ class Request
                 if (\is_numeric(\substr($name, 0, 1))) {
                     throw new \Exception('Parameter "' . $name . '" is not valid');
                 }
+                $params[$name] = $matches[2] ?? true;
                 continue;
             }
             if (\preg_match('/^-([\w-]+)(?:=(.*))?$/', $param, $matches)) {
