@@ -38,16 +38,43 @@ abstract class Command implements CommandInterface
     public const ENCIRCLED = 52;
     public const OVERLINED = 53;
 
-    public function __construct()
+    /**
+     * @var resource
+     */
+    protected $stdin;
+    /**
+     * @var resource
+     */
+    protected $stdout;
+    /**
+     * @var resource
+     */
+    protected $stderr;
+    public function __construct($stdin = null, $stdout = null, $stderr = null)
     {
-        \defined('STDIN') or \define('STDIN', \fopen('php://stdin', 'r'));
-        \defined('STDOUT') or \define('STDOUT', \fopen('php://stdout', 'w'));
-        \defined('STDERR') or \define('STDERR', \fopen('php://stderr', 'w'));
+        if (!$stdin
+            && (\defined('STDIN') || \define('STDIN', \fopen('php://stdin', 'r')))
+        ) {
+            $stdin = \STDIN;
+        }
+
+        if (!$stdout
+            && (\defined('STDOUT') or \define('STDOUT', \fopen('php://stdout', 'w')))) {
+            $stdout = \STDOUT;
+        }
+
+        if (!$stderr
+            && (\defined('STDERR') or \define('STDERR', \fopen('php://stderr', 'w')))) {
+            $stderr = STDERR;
+        }
+        $this->stdin = $stdin;
+        $this->stdout = $stdout;
+        $this->stderr = $stderr;
     }
 
     protected function output(string $string, array $format = []): void
     {
-        \fwrite(\STDOUT, $this->formatString($string, $format) . PHP_EOL);
+        \fwrite($this->stdout, $this->formatString($string, $format) . PHP_EOL);
     }
 
     private function formatString(string $string, array $format = []): string
@@ -64,7 +91,7 @@ abstract class Command implements CommandInterface
 
     protected function stderr(string $string): void
     {
-        \fwrite(\STDERR, $string);
+        \fwrite($this->stderr, $string);
     }
 
     protected function info(string $string): void
@@ -109,12 +136,12 @@ abstract class Command implements CommandInterface
 
     protected function stdout(string $message): void
     {
-        \fwrite(\STDOUT, $message);
+        \fwrite($this->stdout, $message);
     }
 
     protected function stdin(bool $raw = false)
     {
-        return $raw ? \fgets(\STDIN) : \rtrim(\fgets(\STDIN), PHP_EOL);
+        return $raw ? \fgets($this->stdin) : \rtrim(\fgets($this->stdin), PHP_EOL);
     }
 
     protected function input(?string $prompt = null)
