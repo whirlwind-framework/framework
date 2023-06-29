@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Whirlwind\App\Console;
 
-abstract class Command implements CommandInterface
+abstract class Command implements CommandInterface, CommandOptionInterface
 {
+    protected array $options = [];
     // foreground color control codes
     public const FG_BLACK = 30;
     public const FG_RED = 31;
@@ -116,22 +117,33 @@ abstract class Command implements CommandInterface
 
     protected function confirm(string $message, $default = false)
     {
-        while (true) {
-            $this->stdout($message . ' (yes|no) [' . ($default ? 'yes' : 'no') . ']:');
-            $input = \trim($this->stdin());
+        if ($this->isInteractive()) {
+            while (true) {
+                $this->stdout($message . ' (yes|no) [' . ($default ? 'yes' : 'no') . ']:');
+                $input = \trim($this->stdin());
 
-            if (empty($input)) {
-                return $default;
-            }
+                if (empty($input)) {
+                    return $default;
+                }
 
-            if (!\strcasecmp($input, 'y') || !\strcasecmp($input, 'yes')) {
-                return true;
-            }
+                if (!\strcasecmp($input, 'y') || !\strcasecmp($input, 'yes')) {
+                    return true;
+                }
 
-            if (!\strcasecmp($input, 'n') || !\strcasecmp($input, 'no')) {
-                return false;
+                if (!\strcasecmp($input, 'n') || !\strcasecmp($input, 'no')) {
+                    return false;
+                }
             }
         }
+        return true;
+    }
+
+    protected function isInteractive(): bool
+    {
+        return \filter_var(
+            $this->getOption('interactive') ?? $this->getOption('i', false),
+            FILTER_VALIDATE_BOOLEAN
+        );
     }
 
     protected function stdout(string $message): void
@@ -146,10 +158,32 @@ abstract class Command implements CommandInterface
 
     protected function input(?string $prompt = null)
     {
-        if (isset($prompt)) {
-            $this->stdout($prompt);
+        if ($this->isInteractive()) {
+            if (isset($prompt)) {
+                $this->stdout($prompt);
+            }
+
+            return $this->stdin();
         }
 
-        return $this->stdin();
+        return '';
+    }
+
+    public function setOptions(array $options = []): void
+    {
+        $this->options = \array_filter($options, static fn ($k) => !\is_numeric($k), ARRAY_FILTER_USE_KEY);
+    }
+
+    public function getOption(string $name, $default = null)
+    {
+        if (\array_key_exists($name, $this->options)) {
+            return $this->options[$name];
+        }
+
+        if (\array_key_exists($name, $this->options['_aliases'] ?? [])) {
+            return $this->options['_aliases'][$name];
+        }
+
+        return $default;
     }
 }
