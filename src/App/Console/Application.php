@@ -37,6 +37,11 @@ class Application
     public function run(Request $request)
     {
         $command = $this->getHandler($request->getRoute());
+
+        if ($command instanceof CommandOptionInterface) {
+            $command->setOptions($request->getParams());
+        }
+
         return $command->run($request->getParams());
     }
 }
