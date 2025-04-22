@@ -30,8 +30,14 @@ final class JsonDecodeMiddleware implements MiddlewareInterface
             return $request->getParsedBody();
         }
 
+        $body = (string)$request->getBody();
+
+        if ($body === '') {
+            return $request->getParsedBody();
+        }
+
         return \json_decode(
-            (string)$request->getBody(),
+            $body,
             true,
             self::DEFAULT_JSON_DEPTH,
             JSON_THROW_ON_ERROR
